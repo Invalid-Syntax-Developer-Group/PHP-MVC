@@ -1,0 +1,21 @@
+name: Project Chore
+description: Any task that needs to be made to the project in the future
+title: "[CHORE] "
+labels: Chore
+assignees: ALCHElVlY
+
+body:
+  - type: textarea
+    attributes:
+      label: Chore Description
+      description: "Describe the chore in detail"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Chore List
+      description: "Provide a list of work that needs to be done"
+      value: "- [ ] Chore1"
+    validations:
+      required: true
