@@ -125,7 +125,7 @@ class Application extends Container
      */
     private function bindProviders(string $basePath)
     {
-        $providers = require "{$basePath}/config/providers.php";
+        $providers = require "{$basePath}/src/config/providers.php";
 
         foreach ($providers as $provider) {
             $instance = new $provider;
