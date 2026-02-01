@@ -1,2 +1,5 @@
-/vendor/
-/.vscode/
+.env
+vendor
+drivers/*
+*.cache
+*.vscode

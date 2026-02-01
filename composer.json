@@ -6,35 +6,34 @@
     "autoload": {
         "psr-4": {
             "PhpMvc\\": "src/",
-            "PhpMvc\\Framework\\": "src/Framework/",
-            "PhpMvc\\Framework\\Cache\\": "src/Framework/Cache/",
-            "PhpMvc\\Framework\\Cache\\Driver\\": "src/Framework/Cache/Driver/",
-            "PhpMvc\\Framework\\Cache\\Exception\\": "src/Framework/Cache/Exception/",
-            "PhpMvc\\Framework\\Database\\": "src/Framework/Database/",
-            "PhpMvc\\Framework\\Email\\": "src/Framework/Email/",
-            "PhpMvc\\Framework\\FileSystem\\": "src/Framework/FileSystem/",
-            "PhpMvc\\Framework\\Http\\": "src/Framework/Http/",
-            "PhpMvc\\Framework\\Logging\\": "src/Framework/Logging/",
-            "PhpMvc\\Framework\\Logging\\Driver\\": "src/Framework/Logging/Driver/",
-            "PhpMvc\\Framework\\Logging\\Exception\\": "src/Framework/Logging/Exception/",
-            "PhpMvc\\Framework\\Provider\\": "src/Framework/Provider/",
-            "PhpMvc\\Framework\\Queue\\": "src/Framework/Queue/",
-            "PhpMvc\\Framework\\Routing\\": "src/Framework/Routing/",
-            "PhpMvc\\Framework\\Routing\\Exception\\": "src/Framework/Routing/Exception/",
-            "PhpMvc\\Framework\\Session\\": "src/Framework/Session/",
-            "PhpMvc\\Framework\\Session\\Driver\\": "src/Framework/Session/Driver/",
-            "PhpMvc\\Framework\\Session\\Exception\\": "src/Framework/Session/Exception/",
-            "PhpMvc\\Framework\\Support\\": "src/Framework/Support/",
-            "PhpMvc\\Framework\\Validation\\": "src/Framework/Validation/",
-            "PhpMvc\\Framework\\Validation\\Exception\\": "src/Framework/Validation/Exception/",
-            "PhpMvc\\Framework\\Validation\\Rule\\": "src/Framework/Validation/Rule/",
-            "PhpMvc\\Framework\\View\\": "src/Framework/View/",
-            "PhpMvc\\Framework\\View\\Engine\\": "src/Framework/View/Engine/"
-        }
+            "PhpMvc\\Cache\\": "src/Cache/",
+            "PhpMvc\\Cache\\Driver\\": "src/Cache/Driver/",
+            "PhpMvc\\Cache\\Exception\\": "src/Cache/Exception/",
+            "PhpMvc\\Database\\": "src/Database/",
+            "PhpMvc\\Email\\": "src/Email/",
+            "PhpMvc\\FileSystem\\": "src/FileSystem/",
+            "PhpMvc\\Http\\": "src/Http/",
+            "PhpMvc\\Logging\\": "src/Logging/",
+            "PhpMvc\\Logging\\Driver\\": "src/Logging/Driver/",
+            "PhpMvc\\Logging\\Exception\\": "src/Logging/Exception/",
+            "PhpMvc\\Provider\\": "src/Provider/",
+            "PhpMvc\\Queue\\": "src/Queue/",
+            "PhpMvc\\Routing\\": "src/Routing/",
+            "PhpMvc\\Routing\\Exception\\": "src/Routing/Exception/",
+            "PhpMvc\\Session\\": "src/Session/",
+            "PhpMvc\\Session\\Driver\\": "src/Session/Driver/",
+            "PhpMvc\\Session\\Exception\\": "src/Session/Exception/",
+            "PhpMvc\\Support\\": "src/Support/",
+            "PhpMvc\\Validation\\": "src/Validation/",
+            "PhpMvc\\Validation\\Exception\\": "src/Validation/Exception/",
+            "PhpMvc\\Validation\\Rule\\": "src/Validation/Rule/",
+            "PhpMvc\\View\\": "src/View/",
+            "PhpMvc\\View\\Engine\\": "src/View/Engine/"
+        },
+        "files": [
+            "src/Helpers.php"
+        ]
     },
-    "files": [
-        "src/Framework/Helpers.php"
-    ],
     "authors": [
         {
             "name": "William L. Holt"
@@ -44,6 +43,6 @@
         "league/flysystem": "^2.0",
         "opis/closure": "^3.6",
         "monolog/monolog": "^2.2",
-        "swiftmailer/swiftmailer": "^6.2"
+        "phpmailer/phpmailer": "^6.5"
     }
 }
