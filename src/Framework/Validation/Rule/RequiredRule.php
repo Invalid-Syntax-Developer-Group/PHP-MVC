@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Framework\Validation\Rule;
 
-class RequiredRule implements Rule
+final class RequiredRule implements Rule
 {
     public function validate(array $data, string $field, array $params): bool
     {

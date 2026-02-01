@@ -27,7 +27,7 @@ use PhpMVC\Framework\Support\DriverFactory;
  *  - {@see Factory::connect()} reads `$config['type']` and resolves a matching registered driver.
  *  - Throws {@see DriverException} when the type is missing or unrecognised.
  *
- * @package PhpMVC\Cache
+ * @package PhpMVC\Framework\Cache
  * @version 1.0
  * @since   2025-09-04
  */

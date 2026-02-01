@@ -4,7 +4,7 @@ namespace PhpMVC\Framework\Validation\Rule;
 
 use InvalidArgumentException;
 
-class MinRule implements Rule
+final class MinRule implements Rule
 {
     public function validate(array $data, string $field, array $params): bool
     {

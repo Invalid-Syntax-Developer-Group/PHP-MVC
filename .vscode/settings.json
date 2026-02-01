@@ -4,9 +4,7 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "**/.github": true,
-        "**/.vscode": true
+        "**/Thumbs.db": true
     },
     "explorerExclude.backup": {}
 }

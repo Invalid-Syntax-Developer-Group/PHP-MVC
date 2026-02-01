@@ -30,11 +30,11 @@
             "PhpMvc\\Framework\\Validation\\Rule\\": "src/Framework/Validation/Rule/",
             "PhpMvc\\Framework\\View\\": "src/Framework/View/",
             "PhpMvc\\Framework\\View\\Engine\\": "src/Framework/View/Engine/"
-        }
+        },
+        "files": [
+            "src/Framework/Helpers.php"
+        ]
     },
-    "files": [
-        "src/Framework/Helpers.php"
-    ],
     "authors": [
         {
             "name": "William L. Holt"
@@ -44,6 +44,6 @@
         "league/flysystem": "^2.0",
         "opis/closure": "^3.6",
         "monolog/monolog": "^2.2",
-        "swiftmailer/swiftmailer": "^6.2"
+        "phpmailer/phpmailer": "^6.5"
     }
 }

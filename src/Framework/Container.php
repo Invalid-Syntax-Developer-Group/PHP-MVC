@@ -37,7 +37,7 @@ use ReflectionNamedType;
  *  - This container does not implement advanced lifetimes/scopes beyond simple caching,
  *    nor does it attempt to auto-register dependencies; services must be bound explicitly.
  *
- * @package PhpMVC
+ * @package PhpMVC\Framework
  * @version 1.0
  * @since   2026-01-31
  */

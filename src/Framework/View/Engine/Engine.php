@@ -20,7 +20,7 @@ use PhpMVC\Framework\View\View;
  *  - The manager injects itself via {@see setManager()}
  *  - The engine renders views on demand via {@see render()}
  *
- * @package PhpMVC\View\Engine
+ * @package PhpMVC\Framework\View\Engine
  * @since   1.0
  */
 interface Engine

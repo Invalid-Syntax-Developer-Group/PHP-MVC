@@ -30,7 +30,7 @@ use PhpMVC\Framework\View\View;
  *  Result:
  *      <h1>Hello World</h1>
  *
- * @package PhpMVC\View\Engine
+ * @package PhpMVC\Framework\View\Engine
  * @since   1.0
  */
 final class BasicEngine implements Engine

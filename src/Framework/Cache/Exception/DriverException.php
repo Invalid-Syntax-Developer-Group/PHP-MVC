@@ -22,7 +22,7 @@ use RuntimeException;
  *  - Caught by higher-level application or bootstrap code to handle
  *    cache configuration failures gracefully
  *
- * @package PhpMVC\Cache\Exception
+ * @package PhpMVC\Framework\Cache\Exception
  * @since   1.0
  */
 final class DriverException extends RuntimeException

@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace PhpMVC\Framework;
 
 Use Exception;
+use PhpMVC\Framework\Application;
 use PhpMVC\Framework\View\View;
 
 if (!function_exists('app')) {
