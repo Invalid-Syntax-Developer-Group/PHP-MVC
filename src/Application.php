@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace PhpMVC;
 
-use Dotenv\Dotenv;
 use PhpMVC\Routing\Router;
 use PhpMVC\Http\Response;
 
@@ -104,7 +103,12 @@ class Application extends Container
      */
     private function configure(string $basePath): void
     {
-        $dotenv = Dotenv::createImmutable($basePath);
+        if (!class_exists('Dotenv\\Dotenv')) {
+            return;
+        }
+
+        $dotenvClass = 'Dotenv\\Dotenv';
+        $dotenv = $dotenvClass::createImmutable($basePath);
         $dotenv->load();
     }
 
