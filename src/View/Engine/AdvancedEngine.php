@@ -90,7 +90,7 @@ final class AdvancedEngine implements Engine
 
         $cached = realpath("{$folder}/{$hash}.php");
 
-        if (!file_exists($hash) || filemtime($view->path) > filemtime($hash)) {
+        if (!file_exists($cached) || filemtime($view->path) > filemtime($cached)) {
             $content = $this->compile(file_get_contents($view->path));
             file_put_contents($cached, $content);
         }

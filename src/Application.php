@@ -55,9 +55,9 @@ class Application extends Container
      *
      * Lazily creates the instance on first access.
      *
-     * @return mixed The singleton Application instance.
+     * @return static The singleton Application instance.
      */
-    public static function getInstance(): mixed
+    public static function getInstance(): static
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -102,7 +102,7 @@ class Application extends Container
      *
      * @return void
      */
-    private function configure(string $basePath)
+    private function configure(string $basePath): void
     {
         $dotenv = Dotenv::createImmutable($basePath);
         $dotenv->load();
