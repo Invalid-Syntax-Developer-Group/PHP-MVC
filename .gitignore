@@ -1,5 +1,0 @@
-.env
-vendor
-drivers/*
-*.cache
-*.vscode
