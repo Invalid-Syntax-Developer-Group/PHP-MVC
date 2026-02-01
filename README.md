@@ -17,12 +17,6 @@ A lightweight, dependency-aware PHP MVC framework with a small, composable core 
 - PHP 8.1+ (recommended)
 - Composer
 
-## Installation
-
-1. Clone this repository.
-2. Run Composer install:
-	 - `composer install`
-
 ## Expected Client Project Structure
 
 Client applications using the framework are expected to have the following structure:
@@ -46,7 +40,7 @@ root/
 
 ## Framework Layout
 
-Core framework code lives in `src/Framework` with modules such as:
+Core framework code lives in `src/` with modules such as:
 
 - `Application` and `Container`
 - `Routing` (Router, Route)
