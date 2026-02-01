@@ -26,8 +26,8 @@ final class ViewProvider
 
     private function bindPaths(Application $app, Manager $manager): void
     {
-        $manager->addPath($app->resolve('paths.base') . '/resources/views');
-        $manager->addPath($app->resolve('paths.base') . '/resources/images');
+        $manager->addPath($app->resolve('paths.base') . '/src/views');
+        $manager->addPath($app->resolve('paths.base') . '/public/images');
     }
 
     private function bindMacros(Application $app, Manager $manager): void
