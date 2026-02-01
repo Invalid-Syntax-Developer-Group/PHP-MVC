@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\FileSystem\Driver;
 
-use Leaque\Flysystem\Filesystem;
+use League\Flysystem\Filesystem;
 
 abstract class Driver
 {

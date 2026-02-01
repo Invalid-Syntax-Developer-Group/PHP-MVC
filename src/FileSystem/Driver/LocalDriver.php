@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace PhpMVC\FileSystem\Driver;
 
-use Leaque\Flysystem\Filesystem;
-use Leaque\Flysystem\Local\LocalFilesystemAdapter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 final class LocalDriver extends Driver
 {
