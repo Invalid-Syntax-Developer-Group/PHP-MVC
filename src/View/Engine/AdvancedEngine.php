@@ -108,7 +108,7 @@ final class AdvancedEngine implements Engine
                 ['contents' => $contents],
             ));
 
-            return $contentsWithLayout;
+            return (string)$contentsWithLayout;
         }
 
         return $contents;
