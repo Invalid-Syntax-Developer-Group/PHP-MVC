@@ -1,0 +1,49 @@
+{
+    "name": "isdv/php-mvc",
+    "description": "A simple PHP MVC framework.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PhpMvc\\": "src/",
+            "PhpMvc\\Framework\\": "src/Framework/",
+            "PhpMvc\\Framework\\Cache\\": "src/Framework/Cache/",
+            "PhpMvc\\Framework\\Cache\\Driver\\": "src/Framework/Cache/Driver/",
+            "PhpMvc\\Framework\\Cache\\Exception\\": "src/Framework/Cache/Exception/",
+            "PhpMvc\\Framework\\Database\\": "src/Framework/Database/",
+            "PhpMvc\\Framework\\Email\\": "src/Framework/Email/",
+            "PhpMvc\\Framework\\FileSystem\\": "src/Framework/FileSystem/",
+            "PhpMvc\\Framework\\Http\\": "src/Framework/Http/",
+            "PhpMvc\\Framework\\Logging\\": "src/Framework/Logging/",
+            "PhpMvc\\Framework\\Logging\\Driver\\": "src/Framework/Logging/Driver/",
+            "PhpMvc\\Framework\\Logging\\Exception\\": "src/Framework/Logging/Exception/",
+            "PhpMvc\\Framework\\Provider\\": "src/Framework/Provider/",
+            "PhpMvc\\Framework\\Queue\\": "src/Framework/Queue/",
+            "PhpMvc\\Framework\\Routing\\": "src/Framework/Routing/",
+            "PhpMvc\\Framework\\Routing\\Exception\\": "src/Framework/Routing/Exception/",
+            "PhpMvc\\Framework\\Session\\": "src/Framework/Session/",
+            "PhpMvc\\Framework\\Session\\Driver\\": "src/Framework/Session/Driver/",
+            "PhpMvc\\Framework\\Session\\Exception\\": "src/Framework/Session/Exception/",
+            "PhpMvc\\Framework\\Support\\": "src/Framework/Support/",
+            "PhpMvc\\Framework\\Validation\\": "src/Framework/Validation/",
+            "PhpMvc\\Framework\\Validation\\Exception\\": "src/Framework/Validation/Exception/",
+            "PhpMvc\\Framework\\Validation\\Rule\\": "src/Framework/Validation/Rule/",
+            "PhpMvc\\Framework\\View\\": "src/Framework/View/",
+            "PhpMvc\\Framework\\View\\Engine\\": "src/Framework/View/Engine/"
+        },
+        "files": [
+            "src/Framework/Helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "William L. Holt"
+        }
+    ],
+    "require": {
+        "league/flysystem": "^2.0",
+        "opis/closure": "^3.6",
+        "monolog/monolog": "^2.2",
+        "phpmailer/phpmailer": "^6.5"
+    }
+}
