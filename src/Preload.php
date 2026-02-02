@@ -54,7 +54,7 @@ if (!function_exists('csrf')) {
             throw new Exception('Session is not enabled');
         }
 
-        $session->put('token', $token = bin2hex(random_bytes(32)));
+        $session->put('token', $token = bin2hex(random_bytes(64)));
 
         return $token;
     }

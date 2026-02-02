@@ -32,7 +32,7 @@
             "PhpMVC\\View\\Engine\\": "src/View/Engine/"
         },
         "files": [
-            "src/Helpers.php"
+            "src/Preload.php"
         ]
     },
     "authors": [

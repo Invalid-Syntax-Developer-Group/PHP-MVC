@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace PhpMVC;
+namespace PhpMVC\Core;
 
 use PhpMVC\Routing\Router;
 use PhpMVC\Http\Response;
@@ -18,16 +18,16 @@ use PhpMVC\Http\Response;
  *  - Normalization of dispatch results into a {@see Response}
  *
  * Lifecycle:
- *  1) {@see getInstance()} obtains the singleton application instance
- *  2) {@see prepare()} loads environment configuration and binds providers
- *  3) {@see run()} dispatches the request and returns a {@see Response}
+ *  1) {@see Application::getInstance()} obtains the singleton application instance
+ *  2) {@see Application::prepare()} loads environment configuration and binds providers
+ *  3) {@see Application::run()} dispatches the request and returns a {@see Response}
  *
  * Configuration conventions:
  *  - Base path is resolved from the container key `paths.base`
  *  - Providers are loaded from: <basePath>/config/providers.php
  *  - Routes are loaded from:     <basePath>/routes.php
  *
- * @package PhpMVC
+ * @package PhpMVC\Core
  * @since   1.0
  */
 class Application extends Container
@@ -40,7 +40,7 @@ class Application extends Container
     /**
      * Application constructor.
      *
-     * Private to enforce singleton usage via {@see getInstance()}.
+     * Private to enforce singleton usage via {@see Application::getInstance()}.
      */
     private function __construct() {}
 
