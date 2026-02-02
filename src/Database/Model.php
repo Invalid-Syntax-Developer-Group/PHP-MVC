@@ -164,7 +164,7 @@ abstract class Model
         $model = new $class;
         $query = $class::query()
             ->from($model->getTable())
-            ->where($foreignKey, $this->attributes['id']);
+            ->where($foreignKey, $this->attributes[$primaryKey]);
 
         return new Relationship($query, 'first');
     }
@@ -174,7 +174,7 @@ abstract class Model
         $model = new $class;
         $query = $class::query()
             ->from($model->getTable())
-            ->where($foreignKey, $this->attributes['id']);
+            ->where($foreignKey, $this->attributes[$primaryKey]);
 
         return new Relationship($query, 'all');
     }

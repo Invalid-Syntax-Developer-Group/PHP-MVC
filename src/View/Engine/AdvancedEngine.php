@@ -82,7 +82,8 @@ final class AdvancedEngine implements Engine
     public function render(View $view): string
     {
         $hash = md5($view->path);
-        $folder = __DIR__ . '/../../../storage/framework/views';
+        $base = function_exists('basePath') ? basePath() : dirname(__DIR__, 4);
+        $folder = $base . '/storage/framework/views';
 
         if (!is_file("{$folder}/{$hash}.php")) {
             touch("{$folder}/{$hash}.php");

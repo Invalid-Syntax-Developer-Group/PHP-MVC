@@ -22,7 +22,7 @@ use PhpMVC\Application;
  *    the container key `paths.base`.
  *
  * Expiration model:
- *  - {@see has()} returns true only when an entry exists and has not expired
+ *  - {@see Driver::has()} returns true only when an entry exists and has not expired
  *  - Expired entries are treated as missing (files may still exist until overwritten/forgotten/flush)
  *
  * Configuration:
