@@ -1,0 +1,192 @@
+Bug,#d73a4a,An error or flaw causing unexpected behavior
+Critical,#b60205,A severe bug affecting major functionality
+Non-Critical,#d4c5f9,A minor bug with limited impact
+Minor,#ededed,A minor issue causing slight inconvenience
+Major,#ff0000,A significant bug affecting key functionality
+Regression,#e99695,A previously fixed bug that has reappeared
+Crash,#b60205,An issue causing the application to crash
+Blocker,#e11d21,A bug preventing further progress
+Cosmetic,#c7def8,A visual issue not affecting functionality
+Data Loss,#ffcc00,An issue causing loss of data
+Performance Issue,#c2e0c6,An issue affecting performance or speed
+Security Vulnerability,#d93f0b,A bug posing a security risk
+UI Glitch,#f9d0c4,A minor visual issue in the user interface
+Unexpected Behavior,#fef2c0,A feature not working as expected
+Unhandled Exception,#f9d0c4,A crash due to an unhandled exception
+Memory Leak,#d93f0b,An issue causing increased memory usage over time
+Network Issue,#d4c5f9,A problem with network communication
+Database Error,#c2e0c6,An error related to database operations
+Compatibility Issue,#f9d0c4,A problem with compatibility between components
+Incorrect Calculation,#c7def8,A bug causing incorrect calculations
+Timeout,#fef2c0,An issue causing operations to timeout
+Stability Issue,#e99695,An issue affecting the stability of the application
+Configuration Error,#e11d21,A bug due to incorrect configuration
+Installation Issue,#c2e0c6,An issue with the installation process
+Deprecation Warning,#ffcc00,A warning about deprecated features
+Enhancement,#84b6eb,A suggested improvement to existing functionality
+Feature,#a2eeef,A request for a new feature
+Improvement,#bfdadc,A suggestion to improve current features
+New Functionality,#c5def5,Request for entirely new functionality
+Feature Request,#bfe5bf,A user request for a new feature
+UI Enhancement,#c7def8,Suggested improvements for the user interface
+Performance Improvement,#c2e0c6,Suggestions to improve performance
+Accessibility,#bfdadc,Enhancements related to accessibility
+Localization,#c7def8,Suggestions for localization improvements
+Integration,#c2e0c6,Requests for integration with other tools
+Automation,#c7def8,Suggestions for automation of tasks
+Usability,#bfdadc,Improvements to enhance usability
+Workflow Improvement,#c7def8,Suggestions to improve workflows
+Scalability,#c2e0c6,Enhancements to make the system more scalable
+Security Enhancement,#d93f0b,Suggestions to improve security
+Modularization,#c5def5,Requests for modularization of components
+API Improvement,#bfdadc,Suggestions for improving the API
+Code Cleanup,#c7def8,Requests for cleaning up the codebase
+Documentation Update,#bfdadc,Suggestions for updating documentation
+Design Enhancement,#c5def5,Suggestions to improve design
+Refactoring,#bfdadc,Suggestions for code refactoring
+Testing,#c2e0c6,Requests for improving/testing existing code
+Optimization,#c7def8,Suggestions for optimizing the code
+Data Processing,#c2e0c6,Improvements related to data processing
+Deployment,#bfdadc,Requests related to deployment process
+Priority: High,#e11d21,High priority issue
+Priority: Medium,#fbca04,Medium priority issue
+Priority: Low,#0e8a16,Low priority issue
+Urgent,#e11d21,Urgent priority issue
+Immediate,#d93f0b,Immediate priority issue
+ASAP,#d93f0b,Needs to be addressed as soon as possible
+High Impact,#e11d21,High impact issue
+Next Release,#c2e0c6,To be included in the next release
+Low Impact,#0e8a16,Low impact issue
+Deferred,#c7def8,Deferred for future consideration
+Future,#bfdadc,For future consideration
+Backlog,#c2e0c6,Added to backlog
+Critical Path,#e11d21,Critical path item
+Must-Have,#d93f0b,Essential feature or fix
+Should-Have,#fbca04,Should be included
+Could-Have,#0e8a16,Nice to have
+Status: In Progress,#0e8a16,Currently being worked on
+Status: Blocked,#e11d21,Currently blocked
+Status: Needs Review,#fbca04,Needs review
+Status: Done,#0e8a16,Task is completed
+Status: To Do,#c7def8,To be done
+Status: Testing,#c2e0c6,In testing phase
+Status: Approved,#0e8a16,Approved
+Status: Rejected,#e11d21,Rejected
+Status: On Hold,#fbca04,On hold
+Status: Pending,#c7def8,Pending
+Status: Reopened,#e11d21,Reopened
+Status: Closed,#0e8a16,Closed
+Status: Duplicate,#c7def8,Duplicate
+Status: Not A Bug,#c2e0c6,Not a bug
+Status: Won't Fix,#e11d21,Won't fix
+Status: Can't Reproduce,#fbca04,Cannot reproduce
+Status: Fixed,#0e8a16,Fixed
+Status: Invalid,#e11d21,Invalid
+Status: Verified,#0e8a16,Verified
+Status: Investigating,#fbca04,Investigating
+Status: Triaged,#c2e0c6,Triaged
+Status: Awaiting Feedback,#c7def8,Awaiting feedback
+Status: Under Review,#c2e0c6,Under review
+Status: Escalated,#e11d21,Escalated
+Status: Ready For Deployment,#0e8a16,Ready for deployment
+Help Wanted,#bfe5bf,Assistance needed on an issue
+Question,#d876e3,Inquiry about the project
+Documentation,#c5def5,Documentation-related task
+Support,#c7def8,Request for support
+Clarification Needed,#fbca04,Clarification needed on an issue
+Guidance,#c2e0c6,Guidance required
+How-To,#d876e3,How-to question
+FAQ,#c7def8,Frequently asked questions
+Troubleshooting,#d93f0b,Troubleshooting issues
+Community Help,#c5def5,Help from the community
+Beginner Friendly,#bfe5bf,Suitable for beginners
+Good First Issue,#bfe5bf,Good issue for newcomers
+Mentor Needed,#d876e3,Mentor required for guidance
+Advice,#c7def8,Seeking advice
+Feedback,#fbca04,Feedback needed
+Resources,#c2e0c6,Resources required
+Best Practices,#c5def5,Best practices related
+Examples,#c7def8,Example requests
+Tools,#c2e0c6,Tools-related issue
+Tips,#c5def5,Tips needed
+Workaround,#c7def8,Workaround needed
+Contact Support,#d93f0b,Contact support team
+Bug Report,#d73a4a,Reporting a bug
+Feature Suggestion,#a2eeef,Suggesting a new feature
+Knowledge Base,#c2e0c6,Knowledge base-related
+Refactor,#bfdadc,Code refactoring task
+Test,#c2e0c6,Testing-related task
+Maintenance,#c7def8,Maintenance task
+Performance,#c2e0c6,Performance-related task
+Cleanup,#c7def8,Code cleanup task
+Code Review,#d876e3,Code review task
+Deployment,#bfdadc,Deployment-related task
+Security,#d93f0b,Security-related task
+Accessibility,#bfdadc,Accessibility-related task
+Localization,#c7def8,Localization-related task
+Build,#c2e0c6,Build-related task
+CI/CD,#d876e3,CI/CD-related task
+Bug Fix,#d73a4a,Bug fix task
+Feature Development,#a2eeef,Feature development task
+Research,#c7def8,Research-related task
+Design,#c5def5,Design-related task
+Prototype,#c2e0c6,Prototyping task
+Spike,#d93f0b,Spike task
+Investigation,#fbca04,Investigation task
+Planning,#c7def8,Planning-related task
+Meeting,#c2e0c6,Meeting-related task
+Review,#d876e3,Review-related task
+Discussion,#c7def8,Discussion-related task
+Analysis,#c2e0c6,Analysis-related task
+Frontend,#c7def8,Frontend-related work
+Backend,#c2e0c6,Backend-related work
+Fullstack,#d876e3,Fullstack-related work
+API,#a2eeef,API-related work
+Database,#c2e0c6,Database-related work
+Mobile,#c7def8,Mobile-related work
+Web,#bfdadc,Web-related work
+Desktop,#c5def5,Desktop-related work
+Cloud,#d93f0b,Cloud-related work
+DevOps,#c2e0c6,DevOps-related work
+Security,#d93f0b,Security-related work
+UI/UX,#c7def8,UI/UX-related work
+Machine Learning,#c2e0c6,Machine learning-related work
+Data Science,#bfdadc,Data science-related work
+Big Data,#c5def5,Big data-related work
+Network,#c7def8,Network-related work
+Middleware,#c2e0c6,Middleware-related work
+Integration,#c5def5,Integration-related work
+Microservices,#c7def8,Microservices-related work
+Serverless,#c2e0c6,Serverless-related work
+IoT,#c5def5,IoT-related work
+Blockchain,#c7def8,Blockchain-related work
+Virtualization,#c2e0c6,Virtualization-related work
+Containerization,#c5def5,Containerization-related work
+Automation,#c7def8,Automation-related work
+Wontfix,#e11d21,Won't be fixed
+Duplicate,#c7def8,Duplicate issue
+Invalid,#e11d21,Invalid issue
+Discussion,#c7def8,For discussions
+Research,#c2e0c6,Research-related task
+Tracking,#c5def5,Tracking issue
+Chore,#c7def8,Regular maintenance task
+Meta,#c2e0c6,Meta-related issue
+Question,#d876e3,Inquiry
+Idea,#c5def5,Idea for improvement
+Suggestion,#bfdadc,Suggestion for improvement
+Proposal,#c2e0c6,Proposal for changes
+Epic,#d93f0b,Large body of work
+Story,#c7def8,User story
+Task,#c2e0c6,General task
+Subtask,#c5def5,Smaller task within a larger task
+Milestone,#c7def8,Project milestone
+Goal,#c2e0c6,Project goal
+Objective,#c5def5,Project objective
+Key Result,#c7def8,Key result related to an objective
+Initiative,#c2e0c6,Long-term initiative
+Roadmap,#c5def5,Project roadmap
+Plan,#c7def8,Detailed plan
+Strategy,#c2e0c6,Strategic planning
+Vision,#c5def5,Long-term vision
+Dependencies,#0366d6,Pull requests that update a dependency file
+Patch,#5DF98E,[PR] Merging development -> main
