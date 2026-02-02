@@ -19,6 +19,7 @@ if (!function_exists('app')) {
 if (!function_exists('view')) {
     function view(string $template, array $data = []): View
     {
+        $template = str_replace('.', '/', $template);
         return app('view')->render($template, $data);
     }
 }
