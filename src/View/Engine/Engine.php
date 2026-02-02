@@ -17,8 +17,8 @@ use PhpMVC\View\View;
  *
  * Engine lifecycle:
  *  - The engine is registered with a {@see Manager}
- *  - The manager injects itself via {@see setManager()}
- *  - The engine renders views on demand via {@see render()}
+ *  - The manager injects itself via {@see Engine::setManager()}
+ *  - The engine renders views on demand via {@see Engine::render()}
  *
  * @package PhpMVC\View\Engine
  * @since   1.0
