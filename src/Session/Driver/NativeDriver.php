@@ -21,8 +21,11 @@ class NativeDriver implements Driver
     /**
      * Driver configuration options.
      *
-     * Expected keys:
-     *  - prefix : string key prefix applied to all session entries
+    * Expected keys:
+    *  - prefix : string key prefix applied to all session entries
+    *  - name   : optional session name
+    *  - cookie : optional array of cookie settings
+    *            (lifetime, path, domain, secure, httponly, samesite)
      *
      * @var array
      */
@@ -31,10 +34,10 @@ class NativeDriver implements Driver
     /**
      * NativeDriver constructor.
      *
-     * Initializes the session driver with configuration and ensures
-     * the PHP session is active.
+     * Initializes the session with the provided configuration.
+     * Starts the session if not already active.
      *
-     * @param array $config Session configuration options.
+     * @param array $config Driver configuration options.
      */
     public function __construct(array $config)
     {
@@ -43,6 +46,11 @@ class NativeDriver implements Driver
         if (session_status() !== PHP_SESSION_ACTIVE) {
             if (!empty($this->config['name'])) {
                 session_name((string) $this->config['name']);
+            }
+
+            $cookieOptions = $this->resolveCookieOptions();
+            if ($cookieOptions !== null) {
+                session_set_cookie_params($cookieOptions);
             }
             session_start();
         }
@@ -138,5 +146,59 @@ class NativeDriver implements Driver
         }
 
         return $this;
+    }
+
+    /**
+     * Build session cookie options from configuration.
+     *
+     * @return array|null Cookie options for session_set_cookie_params or null if none configured.
+     */
+    private function resolveCookieOptions(): ?array
+    {
+        $cookieConfig = $this->config['cookie'] ?? null;
+
+        if (!is_array($cookieConfig) || $cookieConfig === []) {
+            return null;
+        }
+
+        $defaults = session_get_cookie_params();
+
+        $options = [
+            'lifetime' => $defaults['lifetime'] ?? 0,
+            'path' => $defaults['path'] ?? '/',
+            'domain' => $defaults['domain'] ?? '',
+            'secure' => $defaults['secure'] ?? false,
+            'httponly' => $defaults['httponly'] ?? false,
+        ];
+
+        if (array_key_exists('samesite', $defaults)) {
+            $options['samesite'] = $defaults['samesite'];
+        }
+
+        if (array_key_exists('lifetime', $cookieConfig)) {
+            $options['lifetime'] = (int) $cookieConfig['lifetime'];
+        }
+
+        if (array_key_exists('path', $cookieConfig)) {
+            $options['path'] = (string) $cookieConfig['path'];
+        }
+
+        if (array_key_exists('domain', $cookieConfig)) {
+            $options['domain'] = (string) $cookieConfig['domain'];
+        }
+
+        if (array_key_exists('secure', $cookieConfig)) {
+            $options['secure'] = (bool) $cookieConfig['secure'];
+        }
+
+        if (array_key_exists('httponly', $cookieConfig)) {
+            $options['httponly'] = (bool) $cookieConfig['httponly'];
+        }
+
+        if (array_key_exists('samesite', $cookieConfig)) {
+            $options['samesite'] = (string) $cookieConfig['samesite'];
+        }
+
+        return $options;
     }
 }
