@@ -25,7 +25,7 @@ use PhpMVC\View\Engine\Engine;
  *  - Public properties allow engines direct access without getters
  *
  * Typical usage:
- * ```php
+ * ```
  * $view = new View($engine, 'views/home.html', [
  *      'title' => 'Welcome',
  *      'content' => 'Hello world'

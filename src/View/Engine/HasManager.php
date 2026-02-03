@@ -15,7 +15,7 @@ use PhpMVC\View\Manager;
  * configuration, or lifecycle management handled by the manager.
  *
  * Design notes:
- *  - The manager is injected via {@see setManager()} (setter injection)
+ *  - The manager is injected via {@see HasManager::setManager()} (setter injection)
  *  - The fluent return allows chaining during engine registration
  *  - The trait does not enforce how the manager is used; it merely
  *    provides consistent storage and access
