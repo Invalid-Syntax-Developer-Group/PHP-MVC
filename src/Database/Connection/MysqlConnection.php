@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace PhpMVC\Database\Connection;
 
 use Pdo;
+use PdoStatement;
 use InvalidArgumentException;
 use PDOException;
 use PhpMVC\Database\Connection\Connection;
@@ -94,6 +95,31 @@ final class MysqlConnection extends Connection
     public function query(): MysqlQueryBuilder
     {
         return new MysqlQueryBuilder($this);
+    }
+
+    /**
+     * Prepare a raw SQL string for execution.
+     *
+     * @param string $sql Raw SQL query string.
+     *
+     * @return PDOStatement Prepared statement ready for execution.
+     */
+    public function prepare(string $sql): PdoStatement
+    {
+        return $this->pdo->prepare($sql);
+    }
+
+    /**
+     * Execute a prepared statement with optional parameters.
+     *
+     * @param PDOStatement $statement Prepared statement to execute.
+     * @param array<string,mixed> $params Optional bound parameters.
+     *
+     * @return bool True on success, false on failure.
+     */
+    public function execute(PdoStatement $statement, array $params = []): bool
+    {
+        return $statement->execute($params);
     }
 
     /**
