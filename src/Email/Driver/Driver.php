@@ -17,7 +17,7 @@ namespace PhpMVC\Email\Driver;
  *  - Implementations may internally validate required fields prior to sending
  *
  * Typical usage:
- *  ```php
+ * ```
  * $driver
  *      ->to('user@example.com')
  *      ->subject('Welcome')

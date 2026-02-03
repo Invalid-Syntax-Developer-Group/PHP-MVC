@@ -7,24 +7,109 @@ use PdoStatement;
 use PhpMVC\Database\Connection\Connection;
 use PhpMVC\Database\Exception\QueryException;
 
+/**
+ * Abstract Class QueryBuilder
+ *
+ * Base query builder implementation used to compose and execute parameterized
+ * SQL statements against a {@see Connection}.
+ *
+ * This builder provides a fluent interface for common CRUD operations:
+ *  - SELECT with optional WHERE clauses and LIMIT/OFFSET
+ *  - INSERT with named placeholders
+ *  - UPDATE with named placeholders and WHERE clauses
+ *  - DELETE with WHERE clauses
+ *
+ * Execution model:
+ *  - Builder methods configure internal state (type, table, columns, wheres, etc.)
+ *  - {@see QueryBuilder::prepare()} compiles SQL based on the current query type
+ *  - Methods like
+ *      - {@see QueryBuilder::all()},
+ *      - {@see QueryBuilder::first()},
+ *      - {@see QueryBuilder::insert()},
+ *      - {@see QueryBuilder::update()},
+ *      - {@see QueryBuilder::delete()}
+ * 
+ *    prepare and execute statements with named parameters
+ *
+ * Parameter binding:
+ *  - WHERE clauses are compiled into named placeholders using the column name (e.g. `:id`)
+ *  - Where values are built via {@see QueryBuilder::getWhereValues()} and passed into execute()
+ *  - Boolean where values are coerced to integers (0/1)
+ *
+ * Notes:
+ *  - Concrete builders (e.g. {@see MysqlQueryBuilder}) may extend this class
+ *    to add dialect-specific behavior or additional clauses.
+ *  - The caller must set the table via {@see QueryBuilder::from()} for non-dialect defaults.
+ *
+ * @package PhpMVC\Database\QueryBuilder
+ * @since   1.0
+ */
 abstract class QueryBuilder
 {
+    /**
+     * Connection used for preparing and executing queries.
+     */
     protected Connection $connection;
-    protected string $type;
-    protected array $columns;
-    protected string $table;
-    protected int $limit;
-    protected int $offset;
-    protected array $values;
-    protected array $wheres = [];
-
-    /*public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-    }*/
 
     /**
-     * Fetch all rows matching the current query
+     * Current query type: select|insert|update|delete.
+     */
+    protected string $type;
+
+    /**
+     * Selected/target columns for the query.
+     *
+     * @var array<int,string>
+     */
+    protected array $columns;
+
+    /**
+     * Target table for the query.
+     */
+    protected string $table;
+
+    /**
+     * Limit for select queries.
+     */
+    protected int $limit;
+
+    /**
+     * Offset for select queries.
+     */
+    protected int $offset;
+
+    /**
+     * Values used by insert/update queries.
+     *
+     * @var array<string,mixed>
+     */
+    protected array $values;
+
+    /**
+     * Accumulated where clauses.
+     *
+     * Each where is a tuple: [column, comparator, value]
+     *
+     * @var array<int,array{0:string,1:mixed,2:mixed}>
+     */
+    protected array $wheres = [];
+
+    /**
+     * QueryBuilder constructor.
+     *
+     * @param Connection $connection Database connection instance.
+     */
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * Execute the query and return all matching rows.
+     *
+     * If no query type has been set, defaults to a SELECT query.
+     *
+     * @return array<int,array<string,mixed>> Result rows as associative arrays.
      */
     public function all(): array
     {
@@ -39,7 +124,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Prepare a query against a particular connection
+     * Compile and prepare the current query into a PDOStatement.
+     *
+     * @return PDOStatement Prepared statement ready for execution.
+     *
+     * @throws QueryException If the query type is not recognized or no SQL is produced.
      */
     public function prepare(): PdoStatement
     {
@@ -73,7 +162,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Fetch the first row matching the current query
+     * Execute the query and return the first row or null.
+     *
+     * If no query type has been set, defaults to a SELECT query.
+     *
+     * @return array<string,mixed>|null First matching row as an associative array, or null.
      */
     public function first(): ?array
     {
@@ -94,8 +187,12 @@ abstract class QueryBuilder
     }
 
     /**
-     * Limit a set of query results so that it's possible
-     * to fetch a single or limited batch of rows
+     * Set LIMIT/OFFSET for select queries.
+     *
+     * @param int $limit  Maximum number of rows to return.
+     * @param int $offset Number of rows to skip (default: 0).
+     *
+     * @return static Fluent return for chaining.
      */
     public function take(int $limit, int $offset = 0): static
     {
@@ -106,7 +203,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Indicate which table the query is targetting
+     * Set the target table for the query.
+     *
+     * @param string $table Table name.
+     *
+     * @return static Fluent return for chaining.
      */
     public function from(string $table): static
     {
@@ -115,8 +216,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Indicate the query type is a "select" and remember 
-     * which fields should be returned by the query
+     * Begin a SELECT query.
+     *
+     * @param mixed $columns Column list or '*' (default).
+     *
+     * @return static Fluent return for chaining.
      */
     public function select(mixed $columns = '*'): static
     {
@@ -131,8 +235,12 @@ abstract class QueryBuilder
     }
 
     /**
-     * Insert a row of data into the table specified in the query
-     * and return the number of affected rows
+     * Execute an INSERT query.
+     *
+     * @param array<int,string>     $columns Columns to insert.
+     * @param array<string,mixed>   $values  Values keyed by column name.
+     *
+     * @return bool True on successful execution; otherwise false.
      */
     public function insert(array $columns, array $values): bool
     {
@@ -146,7 +254,17 @@ abstract class QueryBuilder
     }
 
     /**
-     * Store where clause data for later queries
+     * Add a WHERE clause to the query.
+     *
+     * Supports two call styles:
+     *  - where('id', 5)              => column '=' comparatorValue
+     *  - where('id', '>=', 5)        => column comparator value
+     *
+     * @param string $column      Column name.
+     * @param mixed  $comparator  Comparator or value when using 2-arg form.
+     * @param mixed  $value       Value when using 3-arg form (default: null).
+     *
+     * @return static Fluent return for chaining.
      */
     public function where(string $column, mixed $comparator, mixed $value = null): static
     {
@@ -160,8 +278,12 @@ abstract class QueryBuilder
     }
 
     /**
-     * Insert a row of data into the table specified in the query
-     * and return the number of affected rows
+     * Execute an UPDATE query.
+     *
+     * @param array<int,string>     $columns Columns to update.
+     * @param array<string,mixed>   $values  Values keyed by column name.
+     *
+     * @return bool True on successful execution; otherwise false.
      */
     public function update(array $columns, array $values): bool
     {
@@ -175,7 +297,9 @@ abstract class QueryBuilder
     }
 
     /**
-     * Get the ID of the last row that was inserted
+     * Get the last insert id from the underlying PDO connection.
+     *
+     * @return string Last insert id.
      */
     public function getLastInsertId(): string
     {
@@ -183,7 +307,9 @@ abstract class QueryBuilder
     }
 
     /**
-     * Delete a row from the database
+     * Execute a DELETE query.
+     *
+     * @return bool True on successful execution; otherwise false.
      */
     public function delete(): bool
     {
@@ -195,7 +321,12 @@ abstract class QueryBuilder
     }
 
     /**
-     * Get the values for the where clause placeholders
+     * Build an array of values used by WHERE parameter bindings.
+     *
+     * Where parameter names are derived from the column names. Boolean values are
+     * coerced to integers (0/1) to improve compatibility with PDO drivers.
+     *
+     * @return array<string,mixed> Named parameter values keyed by column.
      */
     protected function getWhereValues(): array
     {
@@ -218,7 +349,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add select clause to the query
+     * Compile a SELECT clause.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileSelect(string $query): string
     {
@@ -230,7 +365,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add limit and offset clauses to the query
+     * Compile LIMIT/OFFSET clauses for select queries.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileLimit(string $query): string
     {
@@ -246,7 +385,14 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add where clauses to the query
+     * Compile WHERE clauses for the query.
+     *
+     * Multiple where clauses are joined using `AND`.
+     * Each where is compiled into a named placeholder based on the column name.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileWheres(string $query): string
     {
@@ -270,7 +416,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add insert clause to the query
+     * Compile an INSERT statement.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileInsert(string $query): string
     {
@@ -283,7 +433,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add update clause to the query
+     * Compile an UPDATE statement.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileUpdate(string $query): string
     {
@@ -303,7 +457,11 @@ abstract class QueryBuilder
     }
 
     /**
-     * Add delete clause to the query
+     * Compile a DELETE statement.
+     *
+     * @param string $query Current query string.
+     *
+     * @return string Updated query string.
      */
     protected function compileDelete(string $query): string
     {

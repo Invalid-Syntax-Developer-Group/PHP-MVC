@@ -23,7 +23,7 @@ use PhpMVC\Support\DriverFactory;
  * runtime configuration.
  *
  * Configuration model:
- *  - The `$config` array passed to {@see connect()} must include a `type` key
+ *  - The `$config` array passed to {@see Factory::connect()} must include a `type` key
  *    whose value matches a registered driver alias
  *  - Any additional configuration values are passed through to the driver
  *    constructor via the registered closure

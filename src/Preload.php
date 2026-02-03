@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 Use Exception;
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 use PhpMVC\View\View;
 
 if (!function_exists('app')) {

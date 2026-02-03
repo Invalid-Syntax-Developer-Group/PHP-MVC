@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Cache\Driver;
 
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 
 /**
  * Class FileDriver
