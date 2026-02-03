@@ -17,7 +17,7 @@ use InvalidArgumentException;
  *  - Response body content
  *
  * It allows controllers and middleware to build responses declaratively
- * and defer actual output until {@see send()} is called.
+ * and defer actual output until {@see Response::send()} is called.
  *
  * Supported response types:
  *  - HTML     : Sends text/html content
@@ -28,7 +28,7 @@ use InvalidArgumentException;
  *  - Uses a fluent interface for mutation methods
  *  - Getter/setter dual-purpose methods return current value when called
  *    with no arguments
- *  - Output is emitted immediately when {@see send()} is invoked
+ *  - Output is emitted immediately when {@see Response::send()} is invoked
  *
  * @package PhpMVC\Http
  * @since   1.0

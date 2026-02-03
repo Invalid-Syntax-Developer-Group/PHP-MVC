@@ -10,7 +10,7 @@ namespace PhpMVC\Email\Driver;
  * An email driver is responsible for composing and sending an email message
  * using a specific transport mechanism (e.g. PHP mail, SMTP, third-party API).
  * Implementations are expected to support a fluent interface for message
- * composition, followed by a terminal {@see send()} operation.
+ * composition, followed by a terminal {@see Driver::send()} operation.
  *
  * Composition model:
  *  - Message attributes (recipient, subject, body) are set via chained calls
