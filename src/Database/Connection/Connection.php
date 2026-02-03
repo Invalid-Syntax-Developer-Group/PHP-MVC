@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace PhpMVC\Database\Connection;
 
 use Pdo;
+use PdoStatement;
 use PhpMVC\Database\QueryBuilder\QueryBuilder;
 
 /**
@@ -44,6 +45,28 @@ abstract class Connection
      * @return QueryBuilder Query builder bound to this connection.
      */
     abstract public function query(): QueryBuilder;
+
+    /**
+     * Prepare a raw SQL string for execution.
+     *
+     * Implementations must return a prepared {@see PDOStatement}
+     * for the provided SQL string.
+     *
+     * @param string $sql Raw SQL query string.
+     *
+     * @return PDOStatement Prepared statement ready for execution.
+     */
+    abstract public function prepare(string $sql): PdoStatement;
+
+    /**
+     * Execute a prepared statement with optional parameters.
+     *
+     * @param PDOStatement $statement Prepared statement to execute.
+     * @param array<string,mixed> $params Optional bound parameters.
+     *
+     * @return bool True on success, false on failure.
+     */
+    abstract public function execute(PdoStatement $statement, array $params = []): bool;
 
     /**
      * Retrieve a list of tables available in the current database/schema.
