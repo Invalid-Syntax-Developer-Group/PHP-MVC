@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Provider;
 
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 use PhpMVC\Support\Config;
 
 final class ConfigProvider

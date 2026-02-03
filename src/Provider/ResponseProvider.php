@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Provider;
 
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 use PhpMVC\Http\Response;
 
 final class ResponseProvider

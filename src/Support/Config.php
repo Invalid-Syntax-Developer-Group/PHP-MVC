@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Support;
 
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 
 class Config
 {

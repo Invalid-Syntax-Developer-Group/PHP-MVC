@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Provider;
 
-use PhpMVC\Application;
+use PhpMVC\Core\Application;
 use PhpMVC\Validation\Manager;
 use PhpMVC\Validation\Rule\EmailRule;
 use PhpMVC\Validation\Rule\MinRule;
