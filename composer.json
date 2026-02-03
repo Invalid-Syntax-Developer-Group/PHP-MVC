@@ -10,6 +10,7 @@
             "PhpMVC\\Cache\\": "src/Cache/",
             "PhpMVC\\Cache\\Driver\\": "src/Cache/Driver/",
             "PhpMVC\\Cache\\Exception\\": "src/Cache/Exception/",
+            "PhpMVC\\Core\\": "src/Core/",
             "PhpMVC\\Database\\": "src/Database/",
             "PhpMVC\\Email\\": "src/Email/",
             "PhpMVC\\FileSystem\\": "src/FileSystem/",
