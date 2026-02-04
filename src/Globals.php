@@ -217,3 +217,10 @@ if (!function_exists('session')) {
         return app('session')->get($key, $default);
     }
 }
+
+if (!function_exists('email')) {
+    function email()
+    {
+        return app('email');
+    }
+}

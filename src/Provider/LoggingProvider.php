@@ -30,12 +30,7 @@ use PhpMVC\Support\DriverProvider;
 final class LoggingProvider extends DriverProvider
 {
     /**
-     * Get the container binding name for the logging service.
-     *
-     * This value is used as the alias when resolving the logging
-     * factory or active logger from the container.
-     *
-     * @return string The service name (`logging`).
+     * @inheritDoc
      */
     protected function name(): string
     {
@@ -43,12 +38,7 @@ final class LoggingProvider extends DriverProvider
     }
 
     /**
-     * Create the logging driver factory.
-     *
-     * The factory is responsible for instantiating concrete
-     * logging drivers based on runtime configuration.
-     *
-     * @return DriverFactory The logging driver factory instance.
+     * @inheritDoc
      */
     protected function factory(): DriverFactory
     {
@@ -56,16 +46,7 @@ final class LoggingProvider extends DriverProvider
     }
 
     /**
-     * Register supported logging drivers.
-     *
-     * Each driver is mapped by alias to a factory closure that
-     * returns a concrete {@see \PhpMVC\Logging\Driver\Driver}
-     * implementation.
-     *
-     * Supported drivers:
-     *  - `stream` : {@see StreamDriver} (Monolog-backed stream logging)
-     *
-     * @return array<string, callable> Driver alias to factory mapping.
+     * @inheritDoc
      */
     protected function drivers(): array
     {
