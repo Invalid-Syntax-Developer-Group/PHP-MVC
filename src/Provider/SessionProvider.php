@@ -24,12 +24,7 @@ use PhpMVC\Support\DriverFactory;
 final class SessionProvider extends DriverProvider
 {
     /**
-     * Get the container binding name for the session service.
-     *
-     * This value is used as the alias when resolving the session
-     * driver from the application container.
-     *
-     * @return string The service name used for session resolution.
+     * @inheritDoc
      */
     protected function name(): string
     {
@@ -37,12 +32,7 @@ final class SessionProvider extends DriverProvider
     }
 
     /**
-     * Create the session driver factory.
-     *
-     * The factory is responsible for instantiating session drivers
-     * based on configuration (e.g. driver type).
-     *
-     * @return DriverFactory The session driver factory instance.
+     * @inheritDoc
      */
     protected function factory(): DriverFactory
     {
@@ -50,16 +40,7 @@ final class SessionProvider extends DriverProvider
     }
 
     /**
-     * Register available session drivers.
-     *
-     * Defines a map of driver aliases to factory closures. Each
-     * closure receives the driver configuration array and must
-     * return a fully constructed session driver instance.
-     *
-     * Supported drivers:
-     *  - native : PHP native session handler implementation
-     *
-     * @return array<string, callable> Driver alias to factory mappings.
+     * @inheritDoc
      */
     protected function drivers(): array
     {
