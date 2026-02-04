@@ -11,9 +11,12 @@ final class PhpMailerDriver implements Driver
 {
     private array $config;
     private string $to = '';
+    private string $from = '';
+    private string $bcc = '';
     private string $subject = '';
     private string $text = '';
     private string $html = '';
+    private array $attachments = [];
 
     public function __construct(array $config)
     {
@@ -26,6 +29,24 @@ final class PhpMailerDriver implements Driver
     public function to(string $to): static
     {
         $this->to = $to;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function from(string $from): static
+    {
+        $this->from = $from;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function bcc(string $bcc): static
+    {
+        $this->bcc = $bcc;
         return $this;
     }
 
@@ -53,6 +74,15 @@ final class PhpMailerDriver implements Driver
     public function html(string $html): static
     {
         $this->html = $html;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function attachments(array $attachments): static
+    {
+        $this->attachments = $attachments;
         return $this;
     }
 
@@ -87,8 +117,15 @@ final class PhpMailerDriver implements Driver
                 $mailer->addReplyTo((string)$this->config['reply_to']['email'], $replyToName);
             }
 
+            // BCC if provided
+            if ($this->bcc !== '') {
+                $mailer->addBCC($this->bcc);
+            }
+
+            // Subject
             $mailer->Subject = $subject;
 
+            // Body
             if ($this->html !== '') {
                 $mailer->isHTML(true);
                 $mailer->Body = $this->html;
@@ -98,6 +135,11 @@ final class PhpMailerDriver implements Driver
             } else {
                 $mailer->isHTML(false);
                 $mailer->Body = $this->text;
+            }
+
+            // Attachments
+            foreach ($this->attachments as $attachment) {
+                $mailer->addAttachment($attachment);
             }
 
             if (!$mailer->send()) {
@@ -130,15 +172,11 @@ final class PhpMailerDriver implements Driver
             $mailer->Host = $host;
             $mailer->Port = $port;
             $mailer->SMTPAuth = $auth;
-            if ($username !== '') {
-                $mailer->Username = $username;
-            }
-            if ($password !== '') {
-                $mailer->Password = $password;
-            }
-            if ($encryption !== '') {
-                $mailer->SMTPSecure = $encryption;
-            }
+
+            if ($username !== '') $mailer->Username = $username;
+            if ($password !== '') $mailer->Password = $password;
+            if ($encryption !== '') $mailer->SMTPSecure = $encryption;
+
             if (!empty($smtpConfig['options']) && is_array($smtpConfig['options'])) {
                 $mailer->SMTPOptions = $smtpConfig['options'];
             }
