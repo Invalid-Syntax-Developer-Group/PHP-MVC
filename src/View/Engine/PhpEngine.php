@@ -24,6 +24,9 @@ use PhpMVC\View\View;
  *      - Templates may call `$this->extends('layout.name')` to register a layout
  *      - If a layout is registered for the current template, a new view is rendered
  *        with `contents` injected into the view data
+ *  - Shared includes:
+ *      - Templates may call `$this->include('shared.partial', ['foo' => 'bar'])`
+ *        to render shared components with access to current view data
  *  - Macro forwarding:
  *      - Unknown method calls (e.g. `$this->escape(...)`) are forwarded to the
  *        view manager macro registry via {@see HasManager} and {@see Manager::useMacro()}
@@ -46,6 +49,11 @@ final class PhpEngine implements Engine
      * @var array<string,string> Map of template file path => layout template identifier.
      */
     protected array $layouts = [];
+
+    /**
+     * @var array<string,mixed> Current view data available to shared includes.
+     */
+    protected array $currentData = [];
 
     /**
      * Forward unknown method calls to the view manager macro system.
@@ -79,12 +87,18 @@ final class PhpEngine implements Engine
      */
     public function render(View $view): string
     {
+        $this->currentData = $view->data;
+
         extract($view->data);
 
         ob_start();
-        include($view->path);
-        $contents = ob_get_contents();
-        ob_end_clean();
+        try {
+            include($view->path);
+            $contents = ob_get_contents();
+        } finally {
+            ob_end_clean();
+            $this->currentData = [];
+        }
 
         if ($layout = $this->layouts[$view->path] ?? null) {
             $contentsWithLayout = view($layout, array_merge(
@@ -96,6 +110,29 @@ final class PhpEngine implements Engine
         }
 
         return $contents;
+    }
+
+    /**
+     * Render a shared template/partial within the current view.
+     *
+     * The included template receives the current view data by default, and
+     * any explicitly provided data overrides it.
+     *
+     * Example usage in a template:
+     *  - `$this->include('shared.header')`
+     *  - `$this->include('components.card', ['title' => 'Hello'])`
+     *
+     * @param string $template Shared template identifier passed to `view()`.
+     * @param array<string,mixed> $data Additional data for the shared template.
+     *
+     * @return string Rendered shared template output.
+     */
+    protected function include(string $template, array $data = []): string
+    {
+        $payload = array_merge($this->currentData, $data);
+        $output = (string)view($template, $payload);
+        echo $output;
+        return $output;
     }
 
     /**
