@@ -23,93 +23,81 @@ final class PhpMailerDriver implements Driver
         $this->config = $config;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function to(string $to): static
     {
         $this->to = $to;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function from(string $from): static
     {
         $this->from = $from;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function bcc(string $bcc): static
     {
         $this->bcc = $bcc;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function subject(string $subject): static
     {
         $this->subject = $subject;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function text(string $text): static
     {
         $this->text = $text;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function html(string $html): static
     {
         $this->html = $html;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function attachments(array $attachments): static
     {
         $this->attachments = $attachments;
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function send(): void
     {
         if ($this->to === '') {
             throw new CompositionException('Recipient address is required.');
         }
 
+        if (empty($this->from)) {
+            throw new CompositionException('Sender address is required.');
+        }
+
         if ($this->text === '' && $this->html === '') {
             throw new CompositionException('At least one of text or HTML body is required.');
         }
 
-        $fromName = (string)($this->config['from']['name'] ?? '');
+        /*$fromName = (string)($this->config['from']['name'] ?? '');
         $fromEmail = (string)($this->config['from']['email'] ?? '');
         if ($fromEmail === '') {
             throw new CompositionException('Sender address is required.');
-        }
+        }*/
 
-        $subject = $this->subject !== '' ? $this->subject : "Message from {$fromName}";
+        //$subject = $this->subject !== '' ? $this->subject : "Message from {$fromName}";
 
         try {
             $mailer = $this->mailer();
-            $mailer->setFrom($fromEmail, $fromName);
+            //$mailer->setFrom($fromEmail, $fromName);
+            if (!empty($this->config['from']['email'])) {
+                $configFromName = (string)($this->config['from']['name'] ?? '');
+                $configFromEmail = (string)($this->config['from']['email'] ?? '');
+                $mailer->setFrom($configFromEmail, $configFromName);
+            } else {
+                $mailer->setFrom($this->from);
+            }
+
             $mailer->addAddress($this->to);
 
             if (!empty($this->config['reply_to']['email'])) {
@@ -123,7 +111,8 @@ final class PhpMailerDriver implements Driver
             }
 
             // Subject
-            $mailer->Subject = $subject;
+            // $mailer->Subject = $subject;
+            $mailer->Subject = $this->subject;
 
             // Body
             if ($this->html !== '') {

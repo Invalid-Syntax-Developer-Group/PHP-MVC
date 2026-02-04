@@ -23,7 +23,12 @@ use PhpMVC\Support\DriverProvider;
 final class EmailProvider extends DriverProvider
 {
     /**
-     * @inheritDoc
+     * Get the container binding name for the email service.
+     *
+     * This value is used as the key when resolving the service
+     * from the application container (e.g. `app('email')`).
+     *
+     * @return string The service name.
      */
     protected function name(): string
     {
@@ -31,7 +36,12 @@ final class EmailProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Create the driver factory instance.
+     *
+     * The factory is responsible for registering available drivers
+     * and returning the appropriate driver based on configuration.
+     *
+     * @return DriverFactory The email driver factory.
      */
     protected function factory(): DriverFactory
     {
@@ -39,7 +49,12 @@ final class EmailProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Define the available email drivers.
+     *
+     * Each driver is registered under a string alias and resolved
+     * lazily via a closure that receives the driver configuration.
+     *
+     * @return array<string, callable> Map of driver aliases to factory closures.
      */
     protected function drivers(): array
     {

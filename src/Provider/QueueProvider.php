@@ -29,7 +29,12 @@ use PhpMVC\Support\DriverFactory;
 final class QueueProvider extends DriverProvider
 {
     /**
-     * @inheritDoc
+     * Get the container binding name for the queue service.
+     *
+     * This value is used as the alias when resolving the queue
+     * factory or active queue driver from the container.
+     *
+     * @return string The service name (`queue`).
      */
     protected function name(): string
     {
@@ -37,7 +42,12 @@ final class QueueProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Create the queue driver factory.
+     *
+     * The factory is responsible for instantiating concrete
+     * queue drivers based on runtime configuration.
+     *
+     * @return DriverFactory The queue driver factory instance.
      */
     protected function factory(): DriverFactory
     {
@@ -45,7 +55,15 @@ final class QueueProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Register supported queue drivers.
+     *
+     * Each driver is mapped by alias to a factory closure that
+     * returns a concrete queue driver implementation.
+     *
+     * Supported drivers:
+     *  - `database` : {@see DatabaseDriver} (database-backed job queue)
+     *
+     * @return array<string, callable> Driver alias to factory mapping.
      */
     protected function drivers(): array
     {
