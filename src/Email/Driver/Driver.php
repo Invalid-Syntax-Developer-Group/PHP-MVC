@@ -44,6 +44,24 @@ interface Driver
     public function to(string $to): static;
 
     /**
+     * Set the sender address.
+     *
+     * @param string $from Sender email address.
+     *
+     * @return static Fluent return for chaining.
+     */
+    public function from(string $from): static;
+
+    /**
+     * Set a blind carbon copy (BCC) recipient address.
+     *
+     * @param string $bcc BCC email address.
+     *
+     * @return static Fluent return for chaining.
+     */
+    public function bcc(string $bcc): static;
+
+    /**
      * Set the email subject line.
      *
      * @param string $subject Email subject.
@@ -75,6 +93,15 @@ interface Driver
      * @return static Fluent return for chaining.
      */
     public function html(string $html): static;
+
+    /**
+     * Set attachments for the email.
+     *
+     * @param array $attachments Array of file paths or attachment data.
+     *
+     * @return static Fluent return for chaining.
+     */
+    public function attachments(array $attachments): static;
 
     /**
      * Send the composed email message.
