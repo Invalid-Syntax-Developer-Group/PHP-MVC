@@ -63,7 +63,7 @@ if (!function_exists('csrf')) {
 }
 
 if (!function_exists('secure')) {
-    function secure()
+    function secure(string $key = 'csrf')
     {
         require_authenticated_session();
 
@@ -73,7 +73,7 @@ if (!function_exists('secure')) {
             throw new Exception('Session is not enabled');
         }
 
-        if (!isset($_POST['csrf']) || !$session->has('token') ||  !hash_equals($session->get('token'), $_POST['csrf'])) {
+        if (!isset($_POST[$key]) || !$session->has('token') ||  !hash_equals($session->get('token'), $_POST[$key])) {
             throw new Exception('CSRF token mismatch');
         }
     }
