@@ -33,7 +33,7 @@
             "PhpMVC\\View\\Engine\\": "src/View/Engine/"
         },
         "files": [
-            "src/Preload.php"
+            "src/Globals.php"
         ]
     },
     "authors": [
