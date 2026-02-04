@@ -29,7 +29,12 @@ use PhpMVC\Support\DriverFactory;
 final class CacheProvider extends DriverProvider
 {
     /**
-     * @inheritDoc
+     * Return the container service name for this provider.
+     *
+     * This name is used when resolving the cache factory
+     * from the application container (e.g. `app('cache')`).
+     *
+     * @return string The cache service identifier.
      */
     protected function name(): string
     {
@@ -37,7 +42,12 @@ final class CacheProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Create and return the cache driver factory.
+     *
+     * The factory is responsible for instantiating cache drivers
+     * based on the provided configuration array.
+     *
+     * @return DriverFactory The cache driver factory instance.
      */
     protected function factory(): DriverFactory
     {
@@ -45,7 +55,14 @@ final class CacheProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Define the available cache drivers.
+     *
+     * Each driver is mapped to a closure that receives a configuration
+     * array and returns a concrete cache driver instance.
+     *
+     * Driver keys correspond to the `type` value in cache configuration.
+     *
+     * @return array<string, callable> Array of driver factories keyed by type.
      */
     protected function drivers(): array
     {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace PhpMVC\Support;
 
 use Closure;
+use RuntimeException;
 
 /**
  * Interface DriverFactory
@@ -32,7 +33,9 @@ interface DriverFactory
      * and return a fully constructed driver instance.
      *
      * Example:
-     *  $factory->addDriver('mysql', fn(array $config) => new MysqlConnection($config));
+     * ```
+     * $factory->addDriver('mysql', fn(array $config) => new MysqlConnection($config));
+     * ```
      *
      * @param string  $alias  Identifier used to select the driver (e.g. "mysql", "file").
      * @param Closure $driver Factory closure responsible for creating the driver instance.
@@ -51,7 +54,7 @@ interface DriverFactory
      *
      * @return mixed The resolved driver instance.
      *
-     * @throws \RuntimeException If the driver type is missing or unrecognised.
+     * @throws RuntimeException If the driver type is missing or unrecognised.
      */
     public function connect(array $config): mixed;
 }

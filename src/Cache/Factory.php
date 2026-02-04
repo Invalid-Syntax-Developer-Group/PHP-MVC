@@ -39,18 +39,7 @@ class Factory implements DriverFactory
     protected array $drivers;
 
     /**
-     * Register a cache driver constructor under an alias.
-     *
-     * The provided closure should accept a configuration array and return
-     * an instance implementing {@see Driver}.
-     *
-     * Example:
-     *  $factory->addDriver('file', fn(array $cfg) => new FileDriver($cfg));
-     *
-     * @param string  $alias  Driver alias used as the config 'type' selector.
-     * @param Closure $driver Driver constructor closure: fn(array $config): Driver
-     *
-     * @return static Fluent return for chaining.
+     * @inheritDoc
      */
     public function addDriver(string $alias, Closure $driver): static
     {
@@ -59,17 +48,7 @@ class Factory implements DriverFactory
     }
 
     /**
-     * Create and return a cache driver instance from configuration.
-     *
-     * Expected config shape:
-     *  - type: string (required) Alias of the registered driver.
-     *  - ... additional driver-specific keys
-     *
-     * @param array<string,mixed> $config Driver configuration.
-     *
-     * @return Driver Concrete driver instance.
-     *
-     * @throws DriverException If 'type' is missing or does not match a registered driver.
+     * @inheritDoc
      */
     public function connect(array $config): Driver
     {

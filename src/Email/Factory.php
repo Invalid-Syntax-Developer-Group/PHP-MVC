@@ -49,7 +49,9 @@ final class Factory implements DriverFactory
      * an instance implementing {@see Driver}.
      *
      * Example:
-     *  $factory->addDriver('mail', fn(array $cfg) => new MailDriver($cfg));
+     * ```
+     * $factory->addDriver('mail', fn(array $cfg) => new MailDriver($cfg));
+     * ```
      *
      * @param string  $alias  Driver alias used as the configuration selector.
      * @param Closure $driver Driver constructor closure.

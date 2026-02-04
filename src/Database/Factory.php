@@ -26,7 +26,7 @@ use PhpMVC\Support\DriverFactory;
  *  - Clean separation between configuration and implementation
  *
  * Example:
- * ```php
+ * ```
  * $factory->addDriver('mysql', fn ($config) => new MysqlConnection($config));
  * $connection = $factory->connect([
  *     'type' => 'mysql',

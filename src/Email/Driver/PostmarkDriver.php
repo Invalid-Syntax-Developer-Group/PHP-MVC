@@ -7,7 +7,7 @@ use Swift_Message;
 use Postmark\Transport;
 use PhpMVC\Email\Exception\CompositionException;
 
-final class PostmarkDriver extends Driver
+final class PostmarkDriver implements Driver
 {
     private array $config;
     private Swift_Mailer $mailer;
@@ -27,6 +27,18 @@ final class PostmarkDriver extends Driver
         return $this;
     }
 
+    public function from(string $from): static
+    {
+        // Postmark uses the 'from' address from the config
+        return $this;
+    }
+
+    public function bcc(string $bcc): static
+    {
+        // BCC not implemented for PostmarkDriver
+        return $this;
+    }
+
     public function subject(string $subject): static
     {
         $this->subject = $subject;
@@ -42,6 +54,12 @@ final class PostmarkDriver extends Driver
     public function html(string $html): static
     {
         $this->html = $html;
+        return $this;
+    }
+
+    public function attachments(array $attachments): static
+    {
+        // Attachments not implemented for PostmarkDriver
         return $this;
     }
 
@@ -79,7 +97,7 @@ final class PostmarkDriver extends Driver
         $this->mailer()->send($message);
     }
 
-    private function mailer()
+    private function mailer(): Swift_Mailer
     {
         if (!isset($this->mailer)) {
             $transport = new Transport($this->config['token']);

@@ -125,7 +125,8 @@ class Application extends Container
      */
     private function bindProviders(string $basePath)
     {
-        $providers = require "{$basePath}/src/config/providers.php";
+        //$providers = require "{$basePath}/src/config/providers.php";
+        $providers = require "{$basePath}/config/providers.php";
 
         foreach ($providers as $provider) {
             $instance = new $provider;
@@ -155,7 +156,8 @@ class Application extends Container
         if (!$this->has(Router::class)) {
             $router = new Router();
 
-            $routes = require "{$basePath}/src/routes.php";
+            //$routes = require "{$basePath}/src/routes.php";
+            $routes = require "{$basePath}/routes.php";
             $routes($router);
 
             $this->bind(Router::class, fn() => $router);

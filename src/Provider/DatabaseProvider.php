@@ -23,7 +23,12 @@ use PhpMVC\Database\Connection\MysqlConnection;
 class DatabaseProvider extends DriverProvider
 {
     /**
-     * @inheritDoc
+     * Get the container binding name for the database service.
+     *
+     * This value is used as the alias when resolving the database
+     * factory or active connection from the container.
+     *
+     * @return string The service name (`database`).
      */
     protected function name(): string
     {
@@ -31,7 +36,12 @@ class DatabaseProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Create the database driver factory.
+     *
+     * The factory is responsible for instantiating concrete
+     * database connection drivers based on configuration.
+     *
+     * @return DriverFactory The database driver factory instance.
      */
     protected function factory(): DriverFactory
     {
@@ -39,7 +49,16 @@ class DatabaseProvider extends DriverProvider
     }
 
     /**
-     * @inheritDoc
+     * Register supported database drivers.
+     *
+     * Each driver is mapped by alias to a factory closure that
+     * returns a concrete {@see Connection}
+     * implementation.
+     *
+     * Supported drivers:
+     *  - `mysql` : {@see MysqlConnection}
+     *
+     * @return array<string, callable> Driver alias to factory mapping.
      */
     protected function drivers(): array
     {

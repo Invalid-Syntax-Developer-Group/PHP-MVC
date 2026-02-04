@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Support;
 
+use Closure;
 use PhpMVC\Core\Application;
 
 /**
@@ -92,14 +93,14 @@ abstract class DriverProvider
      * Each array entry should map a driver alias to a factory Closure.
      *
      * Example:
-     * ```php
+     * ```
      * return [
      *     'mysql' => fn(array $config) => new MysqlConnection($config),
      *     'sqlite' => fn(array $config) => new SqliteConnection($config),
      * ];
      * ```
      *
-     * @return array<string, \Closure>
+     * @return array<string, Closure>
      */
     abstract protected function drivers(): array;
 }
