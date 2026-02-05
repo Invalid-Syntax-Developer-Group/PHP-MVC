@@ -82,16 +82,27 @@ final class AdvancedEngine implements Engine
     public function render(View $view): string
     {
         $hash = md5($view->path);
-        $base = function_exists('basePath') ? basePath() : dirname(__DIR__, 4);
-        $folder = $base . '/storage/framework/views';
+        $storageEnabled = config('filesystem.default');
+        if (!empty($storageEnabled)) {
+            $storageBase = '';
+            switch ($storageEnabled) {
+                default:
+                    $storageBase = config('filesystem.local.path', '');
+                    break;
+            }
+            $base = rtrim($storageBase, '/');
+        } else {
+            $base = basePath() . '/storage';
+        }
+        $folder = $base . '/framework/views';
 
-        if (!is_file("{$folder}/{$hash}.php")) {
-            touch("{$folder}/{$hash}.php");
+        if (!is_dir($folder)) {
+            mkdir($folder, 0755, true);
         }
 
-        $cached = realpath("{$folder}/{$hash}.php");
+        $cached = "{$folder}/{$hash}.php";
 
-        if (!file_exists($cached) || filemtime($view->path) > filemtime($cached)) {
+        if (!is_file($cached) || filesize($cached) === 0 || filemtime($view->path) > filemtime($cached)) {
             $content = $this->compile(file_get_contents($view->path));
             file_put_contents($cached, $content);
         }
