@@ -25,6 +25,7 @@ use PhpMVC\Support\DriverFactory;
  * added by extending the {@see QueueProvider::drivers()} method.
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class QueueProvider extends DriverProvider
 {

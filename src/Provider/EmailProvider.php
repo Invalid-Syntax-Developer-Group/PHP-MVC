@@ -19,6 +19,7 @@ use PhpMVC\Support\DriverProvider;
  *  - `postmark`  : {@see PostmarkDriver}
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class EmailProvider extends DriverProvider
 {
