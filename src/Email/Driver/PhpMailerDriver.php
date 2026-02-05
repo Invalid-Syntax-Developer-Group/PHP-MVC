@@ -13,6 +13,7 @@ final class PhpMailerDriver implements Driver
     private string $to = '';
     private string $from = '';
     private string $bcc = '';
+    private string $replyTo = '';
     private string $subject = '';
     private string $text = '';
     private string $html = '';
@@ -23,73 +24,96 @@ final class PhpMailerDriver implements Driver
         $this->config = $config;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function to(string $to): static
     {
         $this->to = $to;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function from(string $from): static
     {
         $this->from = $from;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function bcc(string $bcc): static
     {
         $this->bcc = $bcc;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function replyTo(string $replyTo): static
+    {
+        $this->replyTo = $replyTo;
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function subject(string $subject): static
     {
         $this->subject = $subject;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function text(string $text): static
     {
         $this->text = $text;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function html(string $html): static
     {
         $this->html = $html;
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function attachments(array $attachments): static
     {
         $this->attachments = $attachments;
         return $this;
     }
 
-    public function send(): void
+    /**
+     * @inheritDoc
+     */
+    public function send(): bool
     {
-        if ($this->to === '') {
+        if (empty($this->to)) {
             throw new CompositionException('Recipient address is required.');
         }
-
         if (empty($this->from)) {
             throw new CompositionException('Sender address is required.');
         }
-
-        if ($this->text === '' && $this->html === '') {
+        if (empty($this->text) && empty($this->html)) {
             throw new CompositionException('At least one of text or HTML body is required.');
         }
 
-        /*$fromName = (string)($this->config['from']['name'] ?? '');
-        $fromEmail = (string)($this->config['from']['email'] ?? '');
-        if ($fromEmail === '') {
-            throw new CompositionException('Sender address is required.');
-        }*/
-
-        //$subject = $this->subject !== '' ? $this->subject : "Message from {$fromName}";
-
         try {
             $mailer = $this->mailer();
-            //$mailer->setFrom($fromEmail, $fromName);
+
             if (!empty($this->config['from']['email'])) {
                 $configFromName = (string)($this->config['from']['name'] ?? '');
                 $configFromEmail = (string)($this->config['from']['email'] ?? '');
@@ -101,24 +125,29 @@ final class PhpMailerDriver implements Driver
             $mailer->addAddress($this->to);
 
             if (!empty($this->config['reply_to']['email'])) {
+                $replyToEmail = (string)($this->config['reply_to']['email'] ?? '');
                 $replyToName = (string)($this->config['reply_to']['name'] ?? '');
-                $mailer->addReplyTo((string)$this->config['reply_to']['email'], $replyToName);
+                $mailer->addReplyTo($replyToEmail, $replyToName);
+            } else if (!empty($this->replyTo)) {
+                $replyTos = explode(';', $this->replyTo);
+                foreach ($replyTos as $replyTo) {
+                    $mailer->addReplyTo($replyTo);
+                }
             }
 
             // BCC if provided
-            if ($this->bcc !== '') {
+            if (!empty($this->bcc)) {
                 $mailer->addBCC($this->bcc);
             }
 
             // Subject
-            // $mailer->Subject = $subject;
             $mailer->Subject = $this->subject;
 
             // Body
-            if ($this->html !== '') {
+            if (!empty($this->html)) {
                 $mailer->isHTML(true);
                 $mailer->Body = $this->html;
-                if ($this->text !== '') {
+                if (!empty($this->text)) {
                     $mailer->AltBody = $this->text;
                 }
             } else {
@@ -127,13 +156,13 @@ final class PhpMailerDriver implements Driver
             }
 
             // Attachments
-            foreach ($this->attachments as $attachment) {
-                $mailer->addAttachment($attachment);
+            if (!empty($this->attachments)) {
+                foreach ($this->attachments as $attachment) {
+                    $mailer->addAttachment($attachment);
+                }
             }
 
-            if (!$mailer->send()) {
-                throw new DriverException('Email delivery failed.');
-            }
+            return $mailer->send();
         } catch (PhpMailerException $exception) {
             throw new DriverException($exception->getMessage(), (int)$exception->getCode(), $exception);
         }
@@ -141,42 +170,40 @@ final class PhpMailerDriver implements Driver
 
     private function mailer(): PHPMailer
     {
-        $mailer = new PHPMailer(true);
-        $mailer->CharSet = (string)($this->config['charset'] ?? 'UTF-8');
+        try {
+            $mailer = new PHPMailer(true);
+            $mailer->CharSet = (string)($this->config['charset'] ?? 'UTF-8');
+            $mailer->Host    = (string)($this->config['host'] ?? 'localhost');
+            $mailer->Port    = (int)($this->config['port'] ?? 25);
 
-        $transport = (string)($this->config['transport'] ?? 'smtp');
-        $smtpConfig = (array)($this->config['smtp'] ?? []);
+            $transport  = (string)($this->config['transport'] ?? '');
+            switch ($transport) {
+                case 'smtp':
+                    $mailer->isSMTP();
+                    $mailer->Username   = (string)($this->config['username'] ?? '');
+                    $mailer->Password   = (string)($this->config['password'] ?? '');
+                    $mailer->SMTPSecure = (string)($this->config['encryption'] ?? '');
+                    $mailer->SMTPAuth   = (bool)($this->config['auth'] ?? true);
+                    $mailer->Timeout    = (int)($this->config['timeout'] ?? 10);
+                    $mailer->SMTPDebug  = (int)($this->config['debug'] ?? 0);
 
-        $host = (string)($smtpConfig['host'] ?? $this->config['host'] ?? '');
-        $port = (int)($smtpConfig['port'] ?? $this->config['port'] ?? 587);
-        $username = (string)($smtpConfig['username'] ?? $this->config['username'] ?? '');
-        $password = (string)($smtpConfig['password'] ?? $this->config['password'] ?? '');
-        $encryption = (string)($smtpConfig['encryption'] ?? $this->config['encryption'] ?? '');
-        $auth = (bool)($smtpConfig['auth'] ?? $this->config['auth'] ?? true);
-        $timeout = (int)($smtpConfig['timeout'] ?? $this->config['timeout'] ?? 10);
-        $debug = (int)($smtpConfig['debug'] ?? $this->config['debug'] ?? 0);
-
-        if ($transport === 'smtp' || $host !== '') {
-            $mailer->isSMTP();
-            $mailer->Host = $host;
-            $mailer->Port = $port;
-            $mailer->SMTPAuth = $auth;
-
-            if ($username !== '') $mailer->Username = $username;
-            if ($password !== '') $mailer->Password = $password;
-            if ($encryption !== '') $mailer->SMTPSecure = $encryption;
-
-            if (!empty($smtpConfig['options']) && is_array($smtpConfig['options'])) {
-                $mailer->SMTPOptions = $smtpConfig['options'];
+                    if (!empty($this->config['smtp_options']) &&
+                        is_array($this->config['smtp_options'])) {
+                        $mailer->SMTPOptions = $this->config['smtp_options'];
+                    }
+                    break;
+                case 'sendmail':
+                    $mailer->isSendmail();
+                    break;
+                default:
+                    $mailer->isMail();
+                    break;
             }
-            $mailer->SMTPDebug = $debug;
-            $mailer->Timeout = $timeout;
-        } elseif ($transport === 'sendmail') {
-            $mailer->isSendmail();
-        } else {
-            $mailer->isMail();
-        }
 
-        return $mailer;
+            return $mailer;
+        }
+        catch (PhpMailerException $exception) {
+            throw new DriverException($exception->getMessage(), (int)$exception->getCode(), $exception);
+        }
     }
 }

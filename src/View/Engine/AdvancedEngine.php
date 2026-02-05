@@ -83,6 +83,7 @@ final class AdvancedEngine implements Engine
     {
         $hash = md5($view->path);
         $storageEnabled = config('filesystem.default');
+        
         if (!empty($storageEnabled)) {
             $storageBase = '';
             switch ($storageEnabled) {
@@ -94,6 +95,7 @@ final class AdvancedEngine implements Engine
         } else {
             $base = basePath() . '/storage';
         }
+
         $folder = $base . '/framework/views';
 
         if (!is_dir($folder)) {

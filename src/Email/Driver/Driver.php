@@ -110,7 +110,7 @@ interface Driver
      * Implementations should validate that all required message attributes
      * are present before attempting delivery.
      *
-     * @return void
+     * @return mixed Result of the send operation, implementation-defined.
      */
-    public function send(): void;
+    public function send(): mixed;
 }

@@ -11,7 +11,7 @@ use PhpMVC\Core\Application;
  * on demand and supports dot-notation access to nested values.
  *
  * Configuration files are expected to live under:
- *   \<base\>/src/config/{file}.php
+ *   \<base\>/config/{file}.php
  *
  * Files are loaded lazily and cached in-memory for the lifetime
  * of the request to avoid repeated filesystem access.
@@ -57,7 +57,6 @@ class Config
             $base = Application::getInstance()->resolve('paths.base');
             $separator = DIRECTORY_SEPARATOR;
 
-            //$this->loaded[$file] = (array) require "{$base}{$separator}src{$separator}config{$separator}{$file}.php";
             $this->loaded[$file] = (array) require "{$base}{$separator}config{$separator}{$file}.php";
         }
 
