@@ -57,7 +57,8 @@ class Config
             $base = Application::getInstance()->resolve('paths.base');
             $separator = DIRECTORY_SEPARATOR;
 
-            $this->loaded[$file] = (array) require "{$base}{$separator}src{$separator}config{$separator}{$file}.php";
+            //$this->loaded[$file] = (array) require "{$base}{$separator}src{$separator}config{$separator}{$file}.php";
+            $this->loaded[$file] = (array) require "{$base}{$separator}config{$separator}{$file}.php";
         }
 
         if ($value = $this->withDots($this->loaded[$file], $segments)) {
