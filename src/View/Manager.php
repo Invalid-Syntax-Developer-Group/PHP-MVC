@@ -85,26 +85,81 @@ class Manager
     }
 
     /**
-     * Resolve a template into a View instance.
+     * Resolve and render a template with the given data.
      *
-     * Searches all registered engines and paths to locate a matching
-     * template file and returns a {@see View} bound to the matched engine.
+     * The template is located by searching registered paths and engines.
+     * If found, a {@see View} instance is returned, bound to the appropriate
+     * engine and template file.
      *
-     * @param string               $template Template name without extension.
-     * @param array<string,mixed>  $data     Data to pass into the view.
+     * Template names can use either dot (.) or slash (/) notation for
+     * directory separators. Additionally, an engine selector syntax is
+     * supported: "template.engine" will attempt to use the engine associated
+     * with the "engine" extension when resolving "template".
+     *
+     * @param string $template Template name to resolve.
+     * @param array  $data     Data to bind to the view.
      *
      * @return View Resolved view instance.
      *
-     * @throws Exception If the template cannot be resolved in any path/engine.
+     * @throws Exception If the template cannot be resolved.
      */
     public function render(string $template, array $data = []): View
     {
-        foreach ($this->engines as $extension => $engine) {
-            foreach ($this->paths as $path) {
-                $file = "{$path}/{$template}.{$extension}";
+        $template = str_replace('\\', '/', $template);
 
-                if (is_file($file)) {
-                    return new View($engine, realpath($file), $data);
+        if (str_contains($template, '..')) {
+            throw new Exception("Invalid template '{$template}'");
+        }
+
+        // Try both notations (some parts of the framework turn dots into slashes)
+        $candidates = [$template];
+
+        if (str_contains($template, '.')) {
+            $candidates[] = str_replace('.', '/', $template);
+        }
+        if (str_contains($template, '/')) {
+            $candidates[] = str_replace('/', '.', $template);
+        }
+
+        $candidates = array_values(array_unique($candidates));
+
+        foreach ($candidates as $candidate) {
+            $candidate = trim($candidate, "/ \t\n\r\0\x0B.");
+
+            $engines = $this->engines;
+            $templateBase = $candidate;
+
+            // Engine selector syntax: "layout.advanced" means:
+            // - template base: "layout"
+            // - engine extension: "advanced.php" (or "advanced")
+            if (str_contains($candidate, '.') && !str_contains($candidate, '/')) {
+                $pos = strrpos($candidate, '.');
+                $base = substr($candidate, 0, $pos);
+                $selector = substr($candidate, $pos + 1);
+
+                $preferredExtensions = [];
+                if (array_key_exists($selector, $this->engines)) {
+                    $preferredExtensions[] = $selector;
+                }
+                if (array_key_exists($selector . '.php', $this->engines)) {
+                    $preferredExtensions[] = $selector . '.php';
+                }
+
+                $preferredExtensions = array_values(array_unique($preferredExtensions));
+
+                if (!empty($base) && count($preferredExtensions) > 0) {
+                    $templateBase = $base;
+                    $engines = array_intersect_key($this->engines, array_flip($preferredExtensions));
+                }
+            }
+
+            foreach ($engines as $extension => $engine) {
+                foreach ($this->paths as $path) {
+                    $file = "{$path}/{$templateBase}.{$extension}";
+
+                    if (is_file($file)) {
+                        return new View($engine, realpath($file), $data);
+                    }
                 }
             }
         }

@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 
-Use Exception;
 use PhpMVC\Core\Application;
 use PhpMVC\View\View;
 
@@ -51,30 +50,32 @@ if (!function_exists('csrf')) {
         require_authenticated_session();
 
         $session = session();
+        $key = (string)config('session.auth.csrf_identifier', 'token');
 
         if (!$session) {
             throw new Exception('Session is not enabled');
         }
 
-        $session->put('token', $token = bin2hex(random_bytes($length / 2)));
+        $session->put($key, $token = bin2hex(random_bytes($length / 2)));
 
         return $token;
     }
 }
 
 if (!function_exists('secure')) {
-    function secure(string $key = 'csrf')
+    function secure()
     {
         require_authenticated_session();
 
         $session = session();
+        $key = (string)config('session.auth.csrf_identifier', 'token');
 
         if (!$session) {
             throw new Exception('Session is not enabled');
         }
 
-        if (!isset($_POST[$key]) || !$session->has('token') ||  !hash_equals($session->get('token'), $_POST[$key])) {
-            throw new Exception('CSRF token mismatch');
+        if (!isset($_POST[$key]) || !$session->has($key) ||  !hash_equals($session->get($key), $_POST[$key])) {
+            throw new Exception('CSRF token mismatch'); // Enhance this with a custom exception class later.
         }
     }
 }
