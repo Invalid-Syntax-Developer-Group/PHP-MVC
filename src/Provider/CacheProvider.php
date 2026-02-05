@@ -25,6 +25,7 @@ use PhpMVC\Support\DriverFactory;
  *  - memory : In-memory cache for request-lifetime storage ({@see MemoryDriver})
  * 
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class CacheProvider extends DriverProvider
 {

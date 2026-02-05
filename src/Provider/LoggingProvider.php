@@ -26,6 +26,7 @@ use PhpMVC\Support\DriverProvider;
  * method.
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class LoggingProvider extends DriverProvider
 {

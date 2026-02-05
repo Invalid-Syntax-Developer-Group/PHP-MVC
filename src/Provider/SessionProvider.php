@@ -20,6 +20,7 @@ use PhpMVC\Support\DriverFactory;
  * session lifecycle, storage, and persistence.
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class SessionProvider extends DriverProvider
 {

@@ -18,6 +18,7 @@ use PhpMVC\Http\Response;
  * and status codes.
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class ResponseProvider
 {

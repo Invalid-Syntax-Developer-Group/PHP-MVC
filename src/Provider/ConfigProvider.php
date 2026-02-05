@@ -21,6 +21,7 @@ use PhpMVC\Support\Config;
  * ```
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class ConfigProvider
 {

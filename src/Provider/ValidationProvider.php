@@ -22,6 +22,7 @@ use PhpMVC\Validation\Rule\RequiredRule;
  * rules to be resolved, replaced, or extended independently.
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 final class ValidationProvider
 {

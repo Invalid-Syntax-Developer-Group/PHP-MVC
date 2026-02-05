@@ -19,6 +19,7 @@ use PhpMVC\Database\Connection\MysqlConnection;
  *  - `mysql` : {@see MysqlConnection}
  *
  * @package PhpMVC\Provider
+ * @since 1.0
  */
 class DatabaseProvider extends DriverProvider
 {
