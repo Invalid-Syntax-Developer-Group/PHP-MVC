@@ -5,6 +5,9 @@ namespace PhpMVC\Routing;
 use Exception;
 use Throwable;
 use PhpMVC\Routing\Route;
+use PhpMVC\Routing\Exception\RouteException;
+use Whoops\Run;
+use Whoops\Handler\PrettyPageHandler;
 
 /**
  * Class Router
@@ -237,7 +240,7 @@ class Router
             }
         }
 
-        throw new Exception('No route with that name');
+        throw new RouteException('No route with that name');
     }
 
     /**
