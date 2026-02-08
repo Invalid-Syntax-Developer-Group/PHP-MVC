@@ -133,7 +133,7 @@ if (!function_exists('require_authenticated_session')) {
             redirect_to_login($auth, $requestUri);
         }
 
-        $requiredKey = (string)($auth['required_session_key'] ?? 'user_id');
+        $requiredKey = (string)($auth['required_key'] ?? 'user_id');
         if (!isset($_SESSION[$requiredKey]) || $_SESSION[$requiredKey] === null || $_SESSION[$requiredKey] === '') {
             redirect_to_login($auth, $requestUri);
         }
@@ -159,8 +159,8 @@ if (!function_exists('redirect_to_login')) {
             }
         }
 
-        $subDomain    = (string)($auth['subdomain_prefix'] ?? '');
-        $path         = (string)($auth['path'] ?? '');
+        $subDomain    = (string)($auth['subdomain'] ?? '');
+        $path         = (string)($auth['login_path'] ?? '');
         $returnParam  = (string)($auth['return_param'] ?? 'return');
 
         $loginHost   = ($domain !== '') ? ($subDomain . $domain) : $httpHost;
