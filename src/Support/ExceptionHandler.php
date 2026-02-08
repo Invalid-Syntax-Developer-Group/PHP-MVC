@@ -4,6 +4,8 @@ namespace PhpMVC\Support;
 
 use Throwable;
 use PhpMVC\Validation\Exception\ValidationException;
+use Whoops\Run;
+use Whoops\Handler\PrettyPageHandler;
 
 /**
  * Class ExceptionHandler
