@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Core;
 
+use Throwable;
 use PhpMVC\Routing\Router;
 use PhpMVC\Http\Response;
 
@@ -91,7 +92,30 @@ class Application extends Container
      */
     public function run(): Response
     {
-        return $this->dispatch($this->resolve('paths.base'));
+        try {
+            $response = $this->dispatch($this->resolve('paths.base'));
+            $response->send();
+            return $response;
+        }
+        catch (Throwable $e) {
+            if ($handler = config('handlers.exceptions')) {
+                $instance = new $handler();
+                $result = $instance->showThrowable($e);
+
+                if ($result instanceof Response) {
+                    $result->send();
+                    return $result;
+                }
+
+                if ($result !== null) {
+                    $fallback = $this->resolve('response')->content($result);
+                    $fallback->send();
+                    return $fallback;
+                }
+            }
+
+            throw $e;
+        }
     }
 
     /**
