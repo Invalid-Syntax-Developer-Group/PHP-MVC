@@ -47,7 +47,7 @@ class ExceptionHandler
             return $this->showValidationException($throwable);
         }
 
-        if ($this->isDevEnvironment()) {
+        if ($this->isDevelopment()) {
             $this->showFriendlyThrowable($throwable);
         }
     }
@@ -94,37 +94,13 @@ class ExceptionHandler
         throw $throwable;
     }
 
-    /**
-     * Determine if the application is running in a development environment.
-     *
-     * Checks common environment variable names for indicators of a
-     * development setting (e.g., 'dev', 'development', 'local').
-     *
-     * @return bool True if the environment is considered development.
-     */
-    private function isDevEnvironment(): bool
+    private function isDevelopment(): bool
     {
-        $keys = [
-            'APP_ENV',
-            'APP_ENVIRONMENT',
-            'APPLICATION_ENV',
-            'APPLICATION_ENVIRONMENT',
-        ];
-
-        $devValues = [
-            'dev',
-            'development',
-            'localhost',
-        ];
-
-        foreach ($keys as $key) {
-            if (!isset($_ENV[$key])) {
-                continue;
-            }
-
-            $value = strtolower(trim((string) $_ENV[$key]));
-
-            if (in_array($value, $devValues, true)) {
+        $devKeys = ['APP_ENV', 'APP_ENVIRONMENT', 'APPLICATION_ENV', 'APPLICATION_ENVIRONMENT'];
+        $devValues = ['dev', 'development', 'local', 'localhost'];
+        
+        foreach ($devKeys as $key) {
+            if (isset($_ENV[$key]) && in_array($_ENV[$key], $devValues, true)) {
                 return true;
             }
         }
