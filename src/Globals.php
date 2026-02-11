@@ -189,9 +189,11 @@ if (!function_exists('basePath')) {
 if (!function_exists('env')) {
     function env(string $key, mixed $default = null): mixed
     {
-        if (isset($_SERVER[$key])) {
-            return $_SERVER[$key];
-        }
+        if (isset($_SERVER[$key])) return $_SERVER[$key];
+        if (isset($_ENV[$key])) return $_ENV[$key];
+
+        $value = getenv($key);
+        if ($value !== false) return $value;
 
         return $default;
     }
