@@ -118,7 +118,7 @@ class Router
         $paths = $this->paths();
 
         $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $requestPath = $_SERVER['REQUEST_URI'] ?? '/';
+        $requestPath = $this->normalizeRequestPath((string)($_SERVER['REQUEST_URI'] ?? '/'));
 
         $matching = $this->match($requestMethod, $requestPath);
 
@@ -278,5 +278,48 @@ class Router
         }
 
         return null;
+    }
+
+    /**
+     * Normalize an incoming request URI to a routable path.
+     *
+     * - Removes query strings/fragments.
+     * - Collapses duplicate slashes.
+     * - Strips deployment base path derived from SCRIPT_NAME
+     *   (e.g. "/cs-data-issues") so routes can remain defined from root.
+     *
+     * @param string $requestUri Raw REQUEST_URI value.
+     *
+     * @return string Normalized path beginning with '/'.
+     */
+    private function normalizeRequestPath(string $requestUri): string
+    {
+        $path = parse_url($requestUri, PHP_URL_PATH);
+        $path = is_string($path) && $path !== '' ? $path : '/';
+
+        $path = '/' . ltrim($path, '/');
+        $path = preg_replace('#/+#', '/', $path) ?: '/';
+
+        $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
+        $basePath = str_replace('\\', '/', dirname($scriptName));
+
+        if ($basePath === '.' || $basePath === '/' || $basePath === '\\') {
+            $basePath = '';
+        } else {
+            $basePath = '/' . trim($basePath, '/');
+        }
+
+        if ($basePath !== '') {
+            if ($path === $basePath) {
+                return '/';
+            }
+
+            if (str_starts_with($path, $basePath . '/')) {
+                $path = substr($path, strlen($basePath));
+                $path = $path === '' ? '/' : $path;
+            }
+        }
+
+        return $path;
     }
 }
