@@ -69,7 +69,8 @@ class NativeDriver implements Driver
     public function has(string $key): bool
     {
         $prefix = $this->config['prefix'];
-        return isset($_SESSION["{$prefix}{$key}"]);
+        $sessionKey = !empty($prefix) ? "{$prefix}{$key}" : $key;
+        return isset($_SESSION[$sessionKey]);
     }
 
     /**
@@ -86,9 +87,10 @@ class NativeDriver implements Driver
     public function get(string $key, mixed $default = null): mixed
     {
         $prefix = $this->config['prefix'];
+        $sessionKey = !empty($prefix) ? "{$prefix}{$key}" : $key;
 
-        if (isset($_SESSION["{$prefix}{$key}"])) {
-            return $_SESSION["{$prefix}{$key}"];
+        if (isset($_SESSION[$sessionKey])) {
+            return $_SESSION[$sessionKey];
         }
 
         return $default;
@@ -107,7 +109,8 @@ class NativeDriver implements Driver
     public function put(string $key, mixed $value): static
     {
         $prefix = $this->config['prefix'];
-        $_SESSION["{$prefix}{$key}"] = $value;
+        $sessionKey = !empty($prefix) ? "{$prefix}{$key}" : $key;
+        $_SESSION[$sessionKey] = $value;
         return $this;
     }
 
@@ -123,7 +126,8 @@ class NativeDriver implements Driver
     public function forget(string $key): static
     {
         $prefix = $this->config['prefix'];
-        unset($_SESSION["{$prefix}{$key}"]);
+        $sessionKey = !empty($prefix) ? "{$prefix}{$key}" : $key;
+        unset($_SESSION[$sessionKey]);
         return $this;
     }
 
