@@ -176,27 +176,27 @@ class NativeDriver implements Driver
         }
 
         if (array_key_exists('lifetime', $cookieConfig)) {
-            $options['lifetime'] = (int) $cookieConfig['lifetime'];
+            $options['lifetime'] = (int)$cookieConfig['lifetime'];
         }
 
         if (array_key_exists('path', $cookieConfig)) {
-            $options['path'] = (string) $cookieConfig['path'];
+            $options['path'] = (string)$cookieConfig['path'];
         }
 
         if (array_key_exists('domain', $cookieConfig)) {
-            $options['domain'] = (string) $cookieConfig['domain'];
+            $options['domain'] = (string)$cookieConfig['domain'];
         }
 
         if (array_key_exists('secure', $cookieConfig)) {
-            $options['secure'] = (bool) $cookieConfig['secure'];
+            $options['secure'] = (bool)$cookieConfig['secure'];
         }
 
         if (array_key_exists('httponly', $cookieConfig)) {
-            $options['httponly'] = (bool) $cookieConfig['httponly'];
+            $options['httponly'] = (bool)$cookieConfig['httponly'];
         }
 
         if (array_key_exists('samesite', $cookieConfig)) {
-            $options['samesite'] = (string) $cookieConfig['samesite'];
+            $options['samesite'] = (string)$cookieConfig['samesite'];
         }
 
         return $options;
