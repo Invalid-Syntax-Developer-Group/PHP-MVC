@@ -20,4 +20,4 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          gh pr create --base main --head development --label "Patch"
+          gh pr create --base main --head development --label "Patch --fill"
