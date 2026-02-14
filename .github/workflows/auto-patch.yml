@@ -20,6 +20,10 @@ jobs:
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
+      - name: Fetch Base Branch For PR Metadata
+        run: |
+          git fetch origin main --depth=50 || git fetch origin main || git fetch --no-tags --prune --unshallow
+
       - name: Create Pull Request
         run: |
           gh pr create --base main --head development --fill --label "Patch"
