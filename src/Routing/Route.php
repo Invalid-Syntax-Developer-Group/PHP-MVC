@@ -390,7 +390,7 @@ class Route
         $loginHost   = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
         $location    = $scheme . '://' . $loginHost . $path . '?' . rawurlencode($returnParam) . '=' . rawurlencode($returnUrl);
 
-        redirect($location);
+        redirect($location)->send();
         exit;
     }
 }
