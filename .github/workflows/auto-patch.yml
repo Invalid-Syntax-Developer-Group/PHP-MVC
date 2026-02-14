@@ -12,11 +12,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Git user
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Fetch Base Branch For PR Metadata
+        run: |
+          git fetch origin main --depth=50 || git fetch origin main || git fetch --no-tags --prune --unshallow
 
       - name: Create Pull Request
         run: |
