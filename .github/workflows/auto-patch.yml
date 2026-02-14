@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set up Git user
         run: |
@@ -20,6 +22,4 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          TITLE="$(git log --format=%s origin/main..HEAD | head -n1)"
-          BODY="$(git log --format=%B origin/main..HEAD)"
-          gh pr create --base main --head development --title "$TITLE" --boby "$BODY" --label "Patch"
+          gh pr create --base main --head development --fill --label "Patch"
