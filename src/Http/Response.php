@@ -31,7 +31,7 @@ use InvalidArgumentException;
  *  - Output is emitted immediately when {@see Response::send()} is invoked
  *
  * @package PhpMVC\Http
- * @since   1.0
+ * @since   1.1
  */
 final class Response
 {
@@ -87,12 +87,8 @@ final class Response
      */
     public function content(mixed $content = null): mixed
     {
-        if (is_null($content)) {
-            return $this->content;
-        }
-
+        if (is_null($content)) return $this->content;
         $this->content = $content;
-
         return $this;
     }
 
@@ -108,12 +104,8 @@ final class Response
      */
     public function status(?int $status = null): int|static
     {
-        if (is_null($status)) {
-            return $this->status;
-        }
-
+        if (is_null($status)) return $this->status;
         $this->status = $status;
-
         return $this;
     }
 
@@ -149,6 +141,7 @@ final class Response
 
         $this->redirect = $redirect;
         $this->type = static::REDIRECT;
+        $this->status = 302; // Default to 302 Found for redirects
         return $this;
     }
 
@@ -181,12 +174,8 @@ final class Response
      */
     public function type(?string $type = null): string|static
     {
-        if (is_null($type)) {
-            return $this->type;
-        }
-
+        if (is_null($type)) return $this->type;
         $this->type = $type;
-
         return $this;
     }
 
@@ -206,24 +195,21 @@ final class Response
             header("{$key}: {$value}");
         }
 
-        if ($this->type === static::HTML) {
-            header('Content-Type: text/html');
-            http_response_code($this->status);
-            echo $this->content;
-            return;
-        }
-
-        if ($this->type === static::JSON) {
-            header('Content-Type: application/json');
-            http_response_code($this->status);
-            echo json_encode($this->content);
-            return;
-        }
-
-
-        if ($this->type === static::REDIRECT) {
-            header("Location: {$this->redirect}");
-            return;
+        switch ($this->type) {
+            case static::HTML:
+                header('Content-Type: text/html');
+                http_response_code($this->status);
+                echo $this->content;
+                return;
+            case static::JSON:
+                header('Content-Type: application/json');
+                http_response_code($this->status);
+                echo json_encode($this->content);
+                return;
+            case static::REDIRECT:
+                header("Location: {$this->redirect}");
+                http_response_code($this->status);
+                return;
         }
 
         throw new InvalidArgumentException("{$this->type} is not a recognised type");
