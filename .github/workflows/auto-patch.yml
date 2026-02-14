@@ -20,4 +20,6 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          gh pr create --base main --head development --fill --label "Patch"
+          TITLE="$(git log --format=%s origin/main..HEAD | head -nl)"
+          BODY="$(git log --format=%B origin/main..HEAD)"
+          gh pr create --base main --head development --title "$TITLE" --boby "$BODY" --label "Patch"
