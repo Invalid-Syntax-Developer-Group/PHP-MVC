@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace PhpMVC\Routing;
 
+use Exception;
+
 /**
  * Class Route
  *
@@ -33,6 +35,7 @@ namespace PhpMVC\Routing;
  *    with dependency resolution (e.g., a container).
  *
  * @package PhpMVC\Routing
+ * @since 1.1
  */
 class Route
 {
@@ -227,7 +230,7 @@ class Route
      *
      * @return mixed The handler result.
      */
-    public function dispatch()
+    public function dispatch(): mixed
     {
         if (is_array($this->handler)) {
             [$class, $method] = $this->handler;
@@ -240,6 +243,28 @@ class Route
         }
 
         return app()->call($this->handler);
+    }
+
+    /**
+     * Enforce authentication for this route based on session configuration.
+     *
+     * Authentication flow:
+     *  1) Checks if authentication is enabled in config.
+     *  2) Skips authentication for configured path prefixes.
+     *  3) Verifies presence of session cookie or incoming SID parameter.
+     *  4) Validates required session key (e.g. user_id).
+     *  5) Validates CSRF token from session against request data.
+     *
+     * On failure at any step, redirects to the configured login page with a return URL.
+     *
+     * @return static Fluent self for chaining.
+     *
+     * @throws Exception If session is not enabled or CSRF validation fails.
+     */
+    public function secure(): static
+    {
+        $this->authenticate();
+        return $this;
     }
 
     /**
@@ -261,5 +286,111 @@ class Route
         $path = preg_replace('/[\/]{2,}/', '/', $path);
 
         return $path;
+    }
+
+    /**
+     * Authenticate the request based on session data and configuration.
+     *
+     * Authentication flow:
+     *  1) Checks if authentication is enabled in config.
+     *  2) Skips authentication for configured path prefixes.
+     *  3) Verifies presence of session cookie or incoming SID parameter.
+     *  4) Validates required session key (e.g. user_id).
+     *  5) Validates CSRF token from session against request data.
+     *
+     * On failure at any step, redirects to the configured login page with a return URL.
+     *
+     * @throws Exception If session is not enabled or CSRF validation fails.
+     */
+    private function authenticate(): void
+    {
+        $authentication = (array)config('session.auth', []);
+        if ((!$authentication['enabled'] ?? false)) return;
+
+        $requestUri = (string)filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_UNSAFE_RAW);
+        foreach ((array)($authentication['skip_paths'] ?? []) as $prefix) {
+            $prefix = (string)$prefix;
+            if (!empty($prefix) && str_starts_with($requestUri, $prefix)) {
+                return;
+            }
+        }
+
+        // Ensure the session exists (and cookie params are applied) before we decide to redirect.
+        // Resolving the session driver will start PHP's session if needed.
+        $sessionDriver = session();
+        if (!$sessionDriver) {
+            throw new Exception('Session is not enabled');
+        }
+
+        $cookieName = session_name();
+        if (empty($cookieName)) {
+            $cookieName = (string)config('session.default.name', 'PHPSESSID');
+        }
+
+        $hasCookie = isset($_COOKIE[$cookieName]) && is_string($_COOKIE[$cookieName]) && !empty($_COOKIE[$cookieName]);
+
+        $hasIncomingSid = false;
+        $incomingParams = (array)config('session.incoming_sid_params', []);
+        foreach ($incomingParams as $paramName) {
+            $candidate = filter_input(INPUT_GET, (string)$paramName, FILTER_UNSAFE_RAW);
+            if (is_string($candidate) && !empty($candidate)) {
+                $hasIncomingSid = true;
+                break;
+            }
+        }
+
+        // If this request did not present a session cookie, force the auth flow.
+        // Allow an incoming sid parameter to prevent loops on the return-trip.
+        if (!$hasCookie && !$hasIncomingSid) {
+            $this->redirectToLogin($authentication, $requestUri);
+        }
+
+        $requiredKey = (string)($authentication['required_key'] ?? 'user_id');
+        if (!$sessionDriver->has($requiredKey) || empty($sessionDriver->get($requiredKey))) {
+            $this->redirectToLogin($authentication, $requestUri);
+        }
+
+        $token = (string)config('session.auth.csrf_identifier', 'token');
+        if (!$sessionDriver->has($token) || !hash_equals($sessionDriver->get($token), $_POST[$token])) {
+            throw new Exception('Could not authenticate the request');
+        }
+    }
+
+    /**
+     * Redirect the user to the login page with a return URL.
+     *
+     * Constructs the login URL based on configuration and the current request URI,
+     * then performs an HTTP redirect.
+     *
+     * @param array  $auth       Authentication configuration array.
+     * @param string $requestUri The original request URI to return to after login.
+     */
+    private function redirectToLogin(array $auth, string $requestUri): void
+    {
+        $scheme = (string)filter_input(INPUT_SERVER, 'REQUEST_SCHEME', FILTER_SANITIZE_URL);
+        if (!empty($scheme)) {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        }
+
+        $httpHost = (string)filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
+        $returnUrl = $scheme . '://' . $httpHost . $requestUri;
+
+        $domain = '';
+        if (!empty($httpHost) && $httpHost !== 'localhost' && filter_var($httpHost, FILTER_VALIDATE_IP) === false) {
+            $parts = explode('.', $httpHost);
+            if (count($parts) >= 2) {
+                $domain = '.' . implode('.', array_slice($parts, -2));
+            }
+        }
+
+        $subDomain    = (string)($auth['subdomain'] ?? '');
+        $path         = (string)($auth['login_path'] ?? '');
+        $returnParam  = (string)($auth['return_param'] ?? 'return');
+
+        $loginHost   = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
+        $location    = $scheme . '://' . $loginHost . $path . '?' . rawurlencode($returnParam) . '=' . rawurlencode($returnUrl);
+
+        redirect($location);
+        exit;
     }
 }
