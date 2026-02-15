@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
 use PhpMVC\View\View;
+use PhpMVC\View\Traits\HasManager;
 
 /**
  * Class LiteralEngine

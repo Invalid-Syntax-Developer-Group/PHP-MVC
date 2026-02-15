@@ -30,7 +30,8 @@
             "PhpMVC\\Validation\\Exception\\": "src/Validation/Exception/",
             "PhpMVC\\Validation\\Rule\\": "src/Validation/Rule/",
             "PhpMVC\\View\\": "src/View/",
-            "PhpMVC\\View\\Engine\\": "src/View/Engine/"
+            "PhpMVC\\View\\Engine\\": "src/View/Engine/",
+            "PhpMVC\\View\\Traits\\": "src/View/Traits/"
         },
         "files": [
             "src/Globals.php"

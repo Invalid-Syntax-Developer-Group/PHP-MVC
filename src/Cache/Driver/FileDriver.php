@@ -192,7 +192,7 @@ class FileDriver implements Driver
      *
      * Uses the application container to resolve 'paths.base' and appends
      * the framework cache path segments:
-     *  storage/framework/cache
+     *  storage/cache
      *
      * @return string Absolute cache directory path.
      */
@@ -201,7 +201,7 @@ class FileDriver implements Driver
         $base = Application::getInstance()->resolve('paths.base');
         $separator = DIRECTORY_SEPARATOR;
 
-        return "{$base}{$separator}storage{$separator}framework{$separator}cache";
+        return "{$base}{$separator}storage{$separator}cache";
     }
 
     /**

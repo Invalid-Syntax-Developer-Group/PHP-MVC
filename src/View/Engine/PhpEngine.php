@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
-use PhpMVC\View\Engine\HasManager;
 use PhpMVC\View\View;
+use PhpMVC\View\Traits\HasManager;
 
 /**
  * Class PhpEngine

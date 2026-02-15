@@ -15,6 +15,7 @@ namespace PhpMVC\Session\Driver;
  * is not already active.
  *
  * @package PhpMVC\Session\Driver
+ * @since 1.1
  */
 class NativeDriver implements Driver
 {
@@ -45,11 +46,11 @@ class NativeDriver implements Driver
 
         if (session_status() !== PHP_SESSION_ACTIVE) {
             if (!empty($this->config['name'])) {
-                session_name((string) $this->config['name']);
+                session_name((string)$this->config['name']);
             }
 
             $cookieOptions = $this->resolveCookieOptions();
-            if ($cookieOptions !== null) {
+            if (!is_null($cookieOptions)) {
                 session_set_cookie_params($cookieOptions);
             }
             session_start();
@@ -161,7 +162,7 @@ class NativeDriver implements Driver
     {
         $cookieConfig = $this->config['cookie'] ?? null;
 
-        if (!is_array($cookieConfig) || $cookieConfig === []) {
+        if (!is_array($cookieConfig) || empty($cookieConfig)) {
             return null;
         }
 
