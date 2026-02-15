@@ -48,6 +48,11 @@ final class AdvancedEngine implements Engine
     protected array $layouts = [];
 
     /**
+     * @var string|null Resolved storage base path for current runtime.
+     */
+    protected ?string $storageBase = null;
+
+    /**
      * Forward unknown method calls to the view manager macro system.
      *
      * This enables compiled directives like `@something(...)` to be translated into
@@ -82,29 +87,16 @@ final class AdvancedEngine implements Engine
     public function render(View $view): string
     {
         $hash = md5($view->path);
-        $storageEnabled = config('filesystem.default');
-        
-        if (!empty($storageEnabled)) {
-            $storageBase = '';
-            switch ($storageEnabled) {
-                default:
-                    $storageBase = config('filesystem.default.path', '');
-                    break;
-            }
-            $base = rtrim($storageBase, '/');
-        } else {
-            $base = basePath() . '/storage';
-        }
+        $base = $this->resolveStorageBase();
+        $folder = rtrim($base, '/\\') . DIRECTORY_SEPARATOR . 'views';
 
-        $folder = $base . '/views';
-
-        if (!is_dir($folder)) {
-            mkdir($folder, 0755, true);
-        }
+        if (!is_dir($folder)) mkdir($folder, 0755, true);
 
         $cached = "{$folder}/{$hash}.php";
 
-        if (!is_file($cached) || filesize($cached) === 0 || filemtime($view->path) > filemtime($cached)) {
+        if (!is_file($cached)
+        || filesize($cached) === 0
+        || filemtime($view->path) > filemtime($cached)) {
             $content = $this->compile(file_get_contents($view->path));
             file_put_contents($cached, $content);
         }
@@ -206,5 +198,56 @@ final class AdvancedEngine implements Engine
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         $this->layouts[realpath($backtrace[0]['file'])] = $template;
         return $this;
+    }
+
+    /**
+     * Resolve the base storage path for compiled views.
+     *
+     * This method determines the appropriate base directory for storing compiled view
+     * files based on the filesystem configuration. It checks for a configured default
+     * filesystem driver and its associated path, with support for using a temporary
+     * directory if specified. If no valid configuration is found, it falls back to
+     * using `basePath()/storage` as the default location.
+     *
+     * @return string Resolved base path for compiled view storage.
+     */
+    private function resolveStorageBase(): string
+    {
+        if ($this->storageBase !== null) {
+            return $this->storageBase;
+        }
+
+        $defaultDriver = (string)config('filesystem.default', '');
+        if (empty($defaultDriver)) {
+            $this->storageBase = rtrim(basePath() . '/storage', '/\\');
+            return $this->storageBase;
+        }
+
+        $driverConfig = (array)config("filesystem.{$defaultDriver}", []);
+        $configuredPath = (string)($driverConfig['path'] ?? 'storage');
+        $pathSegment = trim($configuredPath, '/\\');
+        if (empty($pathSegment)) $pathSegment = 'storage';
+
+        $useTempDir = (bool)($driverConfig['use_temp_dir'] ?? false);
+        if ($useTempDir) {
+            $this->storageBase = rtrim(sys_get_temp_dir(), '/\\')
+                . DIRECTORY_SEPARATOR
+                . '{' . uniqid('PHP.APP.', true) . '}'
+                . DIRECTORY_SEPARATOR
+                . $pathSegment;
+
+            return $this->storageBase;
+        }
+
+        $isWindowsAbsolute = (bool)preg_match('/^[A-Za-z]:[\\\\\/]/', $configuredPath)
+            || str_starts_with($configuredPath, '\\\\');
+
+        if ($isWindowsAbsolute) {
+            $this->storageBase = rtrim($configuredPath, '/\\');
+            return $this->storageBase;
+        }
+
+        $this->storageBase = rtrim(basePath(), '/\\') . DIRECTORY_SEPARATOR . $pathSegment;
+        return $this->storageBase;
     }
 }
