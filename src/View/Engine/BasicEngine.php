@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
-use PhpMVC\View\Engine\HasManager;
+use PhpMVC\View\Traits\HasManager;
 use PhpMVC\View\View;
 
 /**
