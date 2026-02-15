@@ -118,12 +118,28 @@ class Router
         $paths = $this->paths();
 
         $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $requestPath = $this->normalizeRequestPath((string)($_SERVER['REQUEST_URI'] ?? '/'));
+        $requestPath = $this->normalize((string)($_SERVER['REQUEST_URI'] ?? '/'));
 
         $matching = $this->match($requestMethod, $requestPath);
 
         if ($matching) {
             $this->current = $matching;
+
+            if ($this->current->requiresAuth) {
+                $requestMethodUpper = strtoupper($requestMethod);
+                $requiresCsrf = !in_array($requestMethodUpper, ['GET', 'HEAD', 'OPTIONS'], true);
+
+                if ($requiresCsrf) {
+                    $session = session();
+                    $token = (string)config('session.auth.csrf_identifier', 'token');
+
+                    if (!isset($_POST[$token])
+                    || !$session->has($token)
+                    || !hash_equals((string)$session->get($token), (string)($_POST[$token] ?? ''))) {
+                        return $this->current->redirectToLogin($requestPath);
+                    }
+                }
+            }
 
             try {
                 return $matching->dispatch();
@@ -251,11 +267,9 @@ class Router
     private function paths(): array
     {
         $paths = [];
-
         foreach ($this->routes as $route) {
             $paths[] = $route->path();
         }
-
         return $paths;
     }
 
@@ -292,7 +306,7 @@ class Router
      *
      * @return string Normalized path beginning with '/'.
      */
-    private function normalizeRequestPath(string $requestUri): string
+    private function normalize(string $requestUri): string
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
         $path = is_string($path) && $path !== '' ? $path : '/';

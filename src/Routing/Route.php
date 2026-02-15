@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Routing;
 
-use Exception;
+use PhpMVC\Session\Exception\DriverException;
 
 /**
  * Class Route
@@ -39,6 +39,13 @@ use Exception;
  */
 class Route
 {
+    /**
+     * Flag indicating whether this route requires authentication.
+     *
+     * @var bool
+     */
+    public bool $requiresAuth = false;
+
     /**
      * HTTP method to match (e.g. GET, POST).
      *
@@ -84,6 +91,7 @@ class Route
      * @param string $method  HTTP method for the route (e.g. GET, POST).
      * @param string $path    Path pattern (static or parameterized).
      * @param mixed  $handler Handler (callable or [class, method] tuple).
+     * @param bool   $requiresAuth Whether the route requires authentication.
      */
     public function __construct(string $method, string $path, $handler)
     {
@@ -175,7 +183,7 @@ class Route
 
         $parameterNames = [];
 
-        $pattern = $this->normalisePath($this->path);
+        $pattern = $this->normalize($this->path);
 
         $pattern = preg_replace_callback('#{([^}]+)}/#', function (array $found) use (&$parameterNames) {
             array_push($parameterNames, rtrim($found[1], '?'));
@@ -191,7 +199,7 @@ class Route
             return false;
         }
 
-        preg_match_all("#{$pattern}#", $this->normalisePath($path), $matches);
+        preg_match_all("#{$pattern}#", $this->normalize($path), $matches);
 
         $parameterValues = [];
 
@@ -263,8 +271,47 @@ class Route
      */
     public function secure(): static
     {
+        $this->requiresAuth = true;
         $this->authenticate();
         return $this;
+    }
+
+    /**
+     * Redirect the user to the login page with a return URL.
+     *
+     * Constructs the login URL based on configuration and the current request URI,
+     * then performs an HTTP redirect.
+     *
+     * @param string $requestUri The original request URI to return to after login.
+     */
+    public function redirectToLogin(string $requestUri): void
+    {
+        $scheme = (string)filter_input(INPUT_SERVER, 'REQUEST_SCHEME', FILTER_SANITIZE_URL);
+        if (!empty($scheme)) {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        }
+
+        $httpHost = (string)filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
+        $returnUrl = $scheme . '://' . $httpHost . $requestUri;
+
+        $domain = '';
+        if (!empty($httpHost) && $httpHost !== 'localhost' && filter_var($httpHost, FILTER_VALIDATE_IP) === false) {
+            $parts = explode('.', $httpHost);
+            if (count($parts) >= 2) {
+                $domain = '.' . implode('.', array_slice($parts, -2));
+            }
+        }
+
+        $config       = (array)config('session.auth', []);
+        $subDomain    = (string)($config['subdomain'] ?? '');
+        $path         = (string)($config['login_path'] ?? '');
+        $returnParam  = (string)($config['return_param'] ?? 'return');
+
+        $loginHost   = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
+        $location    = $scheme . '://' . $loginHost . $path . '?' . rawurlencode($returnParam) . '=' . rawurlencode($returnUrl);
+
+        redirect($location)->send();
+        exit;
     }
 
     /**
@@ -279,7 +326,7 @@ class Route
      *
      * @return string Normalized path.
      */
-    private function normalisePath(string $path): string
+    private function normalize(string $path): string
     {
         $path = trim($path, '/');
         $path = "/{$path}/";
@@ -300,7 +347,7 @@ class Route
      *
      * On failure at any step, redirects to the configured login page with a return URL.
      *
-     * @throws Exception If session is not enabled or CSRF validation fails.
+     * @throws DriverException If session is not enabled or CSRF validation fails.
      */
     private function authenticate(): void
     {
@@ -319,7 +366,7 @@ class Route
         // Resolving the session driver will start PHP's session if needed.
         $sessionDriver = session();
         if (!$sessionDriver) {
-            throw new Exception('Session is not enabled');
+            throw new DriverException('Session is not enabled');
         }
 
         $cookieName = session_name();
@@ -342,55 +389,12 @@ class Route
         // If this request did not present a session cookie, force the auth flow.
         // Allow an incoming sid parameter to prevent loops on the return-trip.
         if (!$hasCookie && !$hasIncomingSid) {
-            $this->redirectToLogin($authentication, $requestUri);
+            $this->redirectToLogin($requestUri);
         }
 
-        $requiredKey = (string)($authentication['required_key'] ?? 'user_id');
-        if (!$sessionDriver->has($requiredKey) || empty($sessionDriver->get($requiredKey))) {
-            $this->redirectToLogin($authentication, $requestUri);
+        $key = (string)($authentication['required_key'] ?? 'id');
+        if (!$sessionDriver->has($key) || empty($sessionDriver->get($key))) {
+            $this->redirectToLogin($requestUri);
         }
-
-        $token = (string)config('session.auth.csrf_identifier', 'token');
-        if (!$sessionDriver->has($token) || !hash_equals($sessionDriver->get($token), $_POST[$token])) {
-            throw new Exception('Could not authenticate the request');
-        }
-    }
-
-    /**
-     * Redirect the user to the login page with a return URL.
-     *
-     * Constructs the login URL based on configuration and the current request URI,
-     * then performs an HTTP redirect.
-     *
-     * @param array  $auth       Authentication configuration array.
-     * @param string $requestUri The original request URI to return to after login.
-     */
-    private function redirectToLogin(array $auth, string $requestUri): void
-    {
-        $scheme = (string)filter_input(INPUT_SERVER, 'REQUEST_SCHEME', FILTER_SANITIZE_URL);
-        if (!empty($scheme)) {
-            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        }
-
-        $httpHost = (string)filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
-        $returnUrl = $scheme . '://' . $httpHost . $requestUri;
-
-        $domain = '';
-        if (!empty($httpHost) && $httpHost !== 'localhost' && filter_var($httpHost, FILTER_VALIDATE_IP) === false) {
-            $parts = explode('.', $httpHost);
-            if (count($parts) >= 2) {
-                $domain = '.' . implode('.', array_slice($parts, -2));
-            }
-        }
-
-        $subDomain    = (string)($auth['subdomain'] ?? '');
-        $path         = (string)($auth['login_path'] ?? '');
-        $returnParam  = (string)($auth['return_param'] ?? 'return');
-
-        $loginHost   = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
-        $location    = $scheme . '://' . $loginHost . $path . '?' . rawurlencode($returnParam) . '=' . rawurlencode($returnUrl);
-
-        redirect($location)->send();
-        exit;
     }
 }
