@@ -115,7 +115,7 @@ final class PhpMailerDriver implements Driver
             $mailer = $this->mailer();
 
             if (!empty($this->config['from']['email'])) {
-                $configFromName = (string)($this->config['from']['name'] ?? '');
+                $configFromName  = (string)($this->config['from']['name'] ?? '');
                 $configFromEmail = (string)($this->config['from']['email'] ?? '');
                 $mailer->setFrom($configFromEmail, $configFromName);
             } else {
