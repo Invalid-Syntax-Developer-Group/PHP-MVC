@@ -73,15 +73,12 @@ final class LocalDriver extends Driver
 
     private function generateTempPath(string $basePath): string
     {
-        $normalizedBasePath = trim($basePath, "\\/");
-        $namespace = !empty($normalizedBasePath) ? basename($normalizedBasePath) : 'filesystem';
-
         return sys_get_temp_dir()
             . DIRECTORY_SEPARATOR
             . 'PHP_APP.'
             . '{'.bin2hex(random_bytes(12)).'}'
             . DIRECTORY_SEPARATOR
-            . $namespace;
+            . $basePath;
     }
 
     private function ensureDirectory(string $path): void
