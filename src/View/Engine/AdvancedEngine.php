@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
-use PhpMVC\View\Engine\HasManager;
 use PhpMVC\View\View;
+use PhpMVC\View\Traits\HasManager;
 
 /**
  * Class AdvancedEngine
@@ -88,7 +88,7 @@ final class AdvancedEngine implements Engine
             $storageBase = '';
             switch ($storageEnabled) {
                 default:
-                    $storageBase = config('filesystem.local.path', '');
+                    $storageBase = config('filesystem.default.path', '');
                     break;
             }
             $base = rtrim($storageBase, '/');
@@ -96,7 +96,7 @@ final class AdvancedEngine implements Engine
             $base = basePath() . '/storage';
         }
 
-        $folder = $base . '/framework/views';
+        $folder = $base . '/views';
 
         if (!is_dir($folder)) {
             mkdir($folder, 0755, true);

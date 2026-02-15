@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace PhpMVC\View\Engine;
+namespace PhpMVC\View\Traits;
 
 use PhpMVC\View\Manager;
 
@@ -24,7 +24,7 @@ use PhpMVC\View\Manager;
  *  - Assigned by the view system when registering or activating an engine
  *  - Used by engines that need contextual awareness of the rendering system
  *
- * @package PhpMVC\View\Engine
+ * @package PhpMVC\View\Traits
  * @since   1.0
  */
 trait HasManager
