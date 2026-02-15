@@ -7,6 +7,9 @@ use PhpMVC\Validation\Manager;
 use PhpMVC\Validation\Rule\EmailRule;
 use PhpMVC\Validation\Rule\MinRule;
 use PhpMVC\Validation\Rule\RequiredRule;
+use PhpMVC\Validation\Rule\TypeRule;
+use PhpMVC\Validation\Rule\NonNegativeRule;
+use PhpMVC\Validation\Rule\InArrayRule;
 
 /**
  * Class ValidationProvider
@@ -22,7 +25,7 @@ use PhpMVC\Validation\Rule\RequiredRule;
  * rules to be resolved, replaced, or extended independently.
  *
  * @package PhpMVC\Provider
- * @since 1.0
+ * @since 1.1
  */
 final class ValidationProvider
 {
@@ -58,6 +61,9 @@ final class ValidationProvider
      * Registered rules:
      *  - required : {@see RequiredRule}
      *  - email    : {@see EmailRule}
+     *  - type     : {@see TypeRule}
+     *  - nonNegative : {@see NonNegativeRule}
+     *  - inArray  : {@see InArrayRule}
      *  - min      : {@see MinRule}
      *
      * @param Application $app     The application container.
@@ -70,9 +76,15 @@ final class ValidationProvider
         $app->bind('validation.rule.required', fn() => new RequiredRule());
         $app->bind('validation.rule.email', fn() => new EmailRule());
         $app->bind('validation.rule.min', fn() => new MinRule());
+        $app->bind('validation.rule.type', fn() => new TypeRule());
+        $app->bind('validation.rule.nonNegative', fn() => new NonNegativeRule());
+        $app->bind('validation.rule.inArray', fn() => new InArrayRule());
 
         $manager->addRule('required', $app->resolve('validation.rule.required'));
         $manager->addRule('email', $app->resolve('validation.rule.email'));
         $manager->addRule('min', $app->resolve('validation.rule.min'));
+        $manager->addRule('type', $app->resolve('validation.rule.type'));
+        $manager->addRule('nonNegative', $app->resolve('validation.rule.nonNegative'));
+        $manager->addRule('inArray', $app->resolve('validation.rule.inArray'));
     }
 }
