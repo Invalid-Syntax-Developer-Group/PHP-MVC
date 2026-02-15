@@ -43,19 +43,6 @@ abstract class Driver
     {
         $this->filesystem = $this->connect($config);
     }
-
-    /**
-     * Establish and return a Flysystem filesystem instance.
-     *
-     * Concrete drivers must implement this method to configure and return
-     * a {@see Filesystem} instance (e.g. LocalFilesystemAdapter, S3Adapter).
-     *
-     * @param array $config Driver-specific configuration.
-     *
-     * @return Filesystem Configured Flysystem filesystem instance.
-     */
-    abstract protected function connect(array $config): Filesystem;
-
     /**
      * List contents of a directory.
      *
@@ -119,4 +106,17 @@ abstract class Driver
         $this->filesystem->delete($path);
         return $this;
     }
+
+    /**
+     * Establish and return a Flysystem filesystem instance.
+     *
+     * Concrete drivers must implement this method to configure and return
+     * a {@see Filesystem} instance (e.g. LocalFilesystemAdapter, S3Adapter).
+     *
+     * @param array $config Driver-specific configuration.
+     *
+     * @return Filesystem Configured Flysystem filesystem instance.
+     */
+    abstract protected function connect(array $config): Filesystem;
+
 }

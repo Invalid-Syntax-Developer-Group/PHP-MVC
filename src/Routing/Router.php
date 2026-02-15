@@ -126,24 +126,10 @@ class Router
             $this->current = $matching;
 
             if ($this->current->requiresAuth) {
-                $requestMethodUpper = strtoupper($requestMethod);
-                $requiresCsrf = !in_array($requestMethodUpper, ['GET', 'HEAD', 'OPTIONS'], true);
-
-                if ($requiresCsrf) {
-                    $session = session();
-                    $token = (string)config('session.auth.csrf_identifier', 'token');
-
-                    if (!isset($_POST[$token])
-                    || !$session->has($token)
-                    || !hash_equals((string)$session->get($token), (string)($_POST[$token] ?? ''))) {
-                        return $this->current->redirectToLogin($requestPath);
-                    }
-                }
+                $this->authenticate($requestMethod, $requestPath);
             }
 
-            try {
-                return $matching->dispatch();
-            }
+            try { return $matching->dispatch(); }
             catch (Throwable $e) {
                 $result = null;
 
@@ -270,6 +256,7 @@ class Router
         foreach ($this->routes as $route) {
             $paths[] = $route->path();
         }
+
         return $paths;
     }
 
@@ -323,17 +310,34 @@ class Router
             $basePath = '/' . trim($basePath, '/');
         }
 
-        if ($basePath !== '') {
+        if (!empty($basePath)) {
             if ($path === $basePath) {
                 return '/';
             }
 
             if (str_starts_with($path, $basePath . '/')) {
                 $path = substr($path, strlen($basePath));
-                $path = $path === '' ? '/' : $path;
+                $path = empty($path) ? '/' : $path;
             }
         }
 
         return $path;
+    }
+
+    private function authenticate(string $requestMethod, string $requestPath)
+    {
+        $requestMethodUpper = strtoupper($requestMethod);
+        $requiresCsrf = !in_array($requestMethodUpper, ['GET', 'HEAD', 'OPTIONS'], true);
+
+        if ($requiresCsrf) {
+            $session = session();
+            $token = (string)config('session.auth.csrf_identifier', 'token');
+
+            if (!isset($_POST[$token])
+            || !$session->has($token)
+            || !hash_equals((string)$session->get($token), (string)($_POST[$token] ?? ''))) {
+                return $this->current->redirectToLogin($requestPath);
+            }
+        }
     }
 }
