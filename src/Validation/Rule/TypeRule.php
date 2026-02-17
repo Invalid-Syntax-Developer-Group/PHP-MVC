@@ -10,6 +10,7 @@ namespace PhpMVC\Validation\Rule;
  * Supported types include:
  *  - "string": The value must be a string.
  *  - "integer": The value must be an integer.
+ *  - "number": The value must be numeric (integer or float).
  *  - "float": The value must be a float.
  *  - "boolean": The value must be a boolean.
  *  - "array": The value must be an array.
@@ -46,6 +47,8 @@ final class TypeRule implements Rule
                 return is_string($data[$field]);
             case 'integer':
                 return is_int($data[$field]);
+            case 'number':
+                return is_numeric($data[$field]);
             case 'float':
                 return is_float($data[$field]);
             case 'boolean':
