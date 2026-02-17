@@ -29,10 +29,15 @@ use PhpMVC\FileSystem\Exception\DriverException;
  * ```
  *
  * @package PhpMVC\FileSystem\Driver
- * @since   1.1
+ * @since   1.2
  */
 final class LocalDriver extends Driver
 {
+    /**
+     * Prefix used when generating unique identifiers for temporary directories.
+     */
+    private const TEMP_DIR_UNIQID_PREFIX = 'PHP.APP.';
+
     /**
      * Create and configure a Flysystem filesystem instance backed by local storage.
      *
@@ -115,7 +120,7 @@ final class LocalDriver extends Driver
     {
         return sys_get_temp_dir()
             . DIRECTORY_SEPARATOR
-            . '{'.uniqid('PHP.APP.',true).'}'
+            . '{'.uniqid(self::TEMP_DIR_UNIQID_PREFIX,true).'}'
             . DIRECTORY_SEPARATOR
             . $basePath;
     }
@@ -134,8 +139,20 @@ final class LocalDriver extends Driver
     private function ensureDirectory(string $path): void
     {
         if (is_dir($path)) return;
-        if (!mkdir($path, 0775, true) && !is_dir($path)) {
-            throw new DriverException('unable to create filesystem path: ' . $path);
+
+        if (!mkdir($path, 0775, true)) {
+            $error = error_get_last();
+
+            // If the directory now exists, it means another process created it; treat as success
+            if (is_dir($path)) return;
+
+            $message = "unable to create filesystem path: {$path}";
+
+            if (is_array($error) && isset($error['message'])) {
+                $message .= ' (' . $error['message'] . ')';
+            }
+
+            throw new DriverException($message);
         }
     }
 }

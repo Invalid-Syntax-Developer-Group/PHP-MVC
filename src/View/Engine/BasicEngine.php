@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
+use RuntimeException;
 use PhpMVC\View\Traits\HasManager;
 use PhpMVC\View\View;
 
@@ -53,11 +54,21 @@ final class BasicEngine implements Engine
     public function render(View $view): string
     {
         $contents = file_get_contents($view->path);
+        if ($contents === false) {
+            throw new RuntimeException("Failed to load view template: {$view->path}");
+        }
 
+        $replacements = [];
         foreach ($view->data as $key => $value) {
-            $contents = str_replace(
-                '{'.$key.'}', $value, $contents
-            );
+            if (!is_string($value) || !preg_match('/^[A-Za-z0-9_]+$/', $key)) {
+                continue; // Skip non-string values and keys with invalid characters
+            }
+
+            $replacements['{'.$key.'}'] = (string)$value;
+        }
+
+        if (!empty($replacements)) {
+            $contents = strtr($contents, $replacements);
         }
 
         return $contents;
