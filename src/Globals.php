@@ -48,7 +48,9 @@ if (!function_exists('csrf')) {
     function csrf(int $length = 64)
     {
         $session = session();
-        $key = (string)config('session.auth.csrf_identifier', 'token');
+        $config = config('session.default', []);
+        $authentication = $config['authentication'] ?? [];
+        $key = (string)($authentication['csrf'] ?? 'token');
 
         if (!$session) {
             throw new Exception('Session is not enabled');

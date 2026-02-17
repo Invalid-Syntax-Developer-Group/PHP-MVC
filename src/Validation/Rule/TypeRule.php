@@ -36,27 +36,28 @@ final class TypeRule implements Rule
      */
     public function validate(array $data, string $field, array $params): bool
     {
-        if (empty($data[$field])) return true;
+        $value = $data[$field] ?? null;
+        if ($value === null || $value === '') return true; // Consider empty values as valid
 
         $expectedType = $params[0] ?? null;
-
-        if ($expectedType === null) return false; // No type specified, cannot validate
+        if (!is_string($expectedType)) return false; // Expected type must be a string
+        $expectedType = trim($expectedType);
 
         switch ($expectedType) {
             case 'string':
-                return is_string($data[$field]);
+                return is_string($value);
             case 'integer':
-                return is_int($data[$field]);
+                return is_int($value);
             case 'number':
-                return is_numeric($data[$field]);
+                return is_numeric($value);
             case 'float':
-                return is_float($data[$field]);
+                return is_float($value);
             case 'boolean':
-                return is_bool($data[$field]);
+                return is_bool($value);
             case 'array':
-                return is_array($data[$field]);
+                return is_array($value);
             case 'object':
-                return is_object($data[$field]);
+                return is_object($value);
             default:
                 return false; // Unsupported type specified
         }
@@ -73,7 +74,13 @@ final class TypeRule implements Rule
      */
     public function getMessage(array $data, string $field, array $params): string
     {
-        $expectedType = $params[0] ?? 'unknown';
+        $expectedType = 'unknown';
+
+        if (isset($params[0]) && is_string($params[0])) {
+            $trimmed = trim($params[0]);
+            if (!empty($trimmed)) $expectedType = $trimmed;
+        }
+
         return "{$field} should be of type {$expectedType}";
     }
 }

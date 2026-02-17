@@ -179,7 +179,7 @@ class Application extends Container
         if (!$this->has(Router::class)) {
             $router = new Router();
 
-            $routes = require "{$basePath}/routes.php";
+            $routes = require "{$basePath}/".strtolower('routes').'.php';
             $routes($router);
 
             $this->bind(Router::class, fn() => $router);

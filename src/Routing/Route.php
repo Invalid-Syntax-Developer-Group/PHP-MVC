@@ -35,7 +35,7 @@ use PhpMVC\Session\Exception\DriverException;
  *    with dependency resolution (e.g., a container).
  *
  * @package PhpMVC\Routing
- * @since 1.1
+ * @since 1.2
  */
 class Route
 {
@@ -302,13 +302,13 @@ class Route
             }
         }
 
-        $config       = (array)config('session.auth', []);
-        $subDomain    = (string)($config['subdomain'] ?? '');
-        $path         = (string)($config['login_path'] ?? '');
-        $returnParam  = (string)($config['return_param'] ?? 'return');
-
-        $loginHost   = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
-        $location    = $scheme . '://' . $loginHost . $path . '?' . rawurlencode($returnParam) . '=' . rawurlencode($returnUrl);
+        $config         = (array)config('session.default', []);
+        $authentication = (array)($config['authentication'] ?? []);
+        $subDomain      = (string)($authentication['subdomain'] ?? '');
+        $path           = (string)($authentication['login_path'] ?? '');
+        $returnParam    = (string)($authentication['return_param'] ?? 'return');
+        $loginHost      = (!empty($domain)) ? ($subDomain . $domain) : $httpHost;
+        $location       = $scheme.'://'.$loginHost.$path.'?'.rawurlencode($returnParam).'='.rawurlencode($returnUrl);
 
         redirect($location)->send();
         exit;
@@ -351,7 +351,8 @@ class Route
      */
     private function authenticate(): void
     {
-        $authentication = (array)config('session.auth', []);
+        $config = (array)config('session.default', []);
+        $authentication = (array)($config['authentication'] ?? []);
         if ((!$authentication['enabled'] ?? false)) return;
 
         $requestUri = (string)filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_UNSAFE_RAW);
@@ -364,36 +365,40 @@ class Route
 
         // Ensure the session exists (and cookie params are applied) before we decide to redirect.
         // Resolving the session driver will start PHP's session if needed.
-        $sessionDriver = session();
-        if (!$sessionDriver) {
+        $session = session();
+        if (!$session) {
             throw new DriverException('Session is not enabled');
         }
 
         $cookieName = session_name();
         if (empty($cookieName)) {
-            $cookieName = (string)config('session.default.name', 'PHPSESSID');
+            $cookieName = (string)($config['name'] ?? 'PHPSESSID');
         }
 
-        $hasCookie = isset($_COOKIE[$cookieName]) && is_string($_COOKIE[$cookieName]) && !empty($_COOKIE[$cookieName]);
+        $hasCookie = isset($_COOKIE[$cookieName]) &&
+                     is_string($_COOKIE[$cookieName]) && !empty($_COOKIE[$cookieName]);
 
-        $hasIncomingSid = false;
-        $incomingParams = (array)config('session.incoming_sid_params', []);
-        foreach ($incomingParams as $paramName) {
-            $candidate = filter_input(INPUT_GET, (string)$paramName, FILTER_UNSAFE_RAW);
-            if (is_string($candidate) && !empty($candidate)) {
-                $hasIncomingSid = true;
-                break;
-            }
-        }
+        // $hasIncomingSid = false;
+        // $incomingParams = (array)config('session.incoming_sid_params', []);
+        // foreach ($incomingParams as $paramName) {
+        //     $candidate = filter_input(INPUT_GET, (string)$paramName, FILTER_UNSAFE_RAW);
+        //     if (is_string($candidate) && !empty($candidate)) {
+        //         $hasIncomingSid = true;
+        //         break;
+        //     }
+        // }
 
         // If this request did not present a session cookie, force the auth flow.
         // Allow an incoming sid parameter to prevent loops on the return-trip.
-        if (!$hasCookie && !$hasIncomingSid) {
+        // if (!$hasCookie && !$hasIncomingSid) {
+        //     $this->redirectToLogin($requestUri);
+        // }
+        if (!$hasCookie) {
             $this->redirectToLogin($requestUri);
         }
 
         $key = (string)($authentication['required_key'] ?? 'id');
-        if (!$sessionDriver->has($key) || empty($sessionDriver->get($key))) {
+        if (!$session->has($key) || empty($session->get($key))) {
             $this->redirectToLogin($requestUri);
         }
     }

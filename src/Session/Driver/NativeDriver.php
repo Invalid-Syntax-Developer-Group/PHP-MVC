@@ -169,39 +169,30 @@ class NativeDriver implements Driver
         $defaults = session_get_cookie_params();
 
         $options = [
-            'lifetime' => $defaults['lifetime'] ?? 0,
-            'path' => $defaults['path'] ?? '/',
-            'domain' => $defaults['domain'] ?? '',
-            'secure' => $defaults['secure'] ?? false,
-            'httponly' => $defaults['httponly'] ?? false,
+            'lifetime' => (int)($defaults['lifetime'] ?? 0),
+            'path'     => (string)($defaults['path'] ?? '/'),
+            'domain'   => (string)($defaults['domain'] ?? ''),
+            'secure'   => (bool)($defaults['secure'] ?? false),
+            'httponly' => (bool)($defaults['httponly'] ?? false),
         ];
 
         if (array_key_exists('samesite', $defaults)) {
-            $options['samesite'] = $defaults['samesite'];
+            $options['samesite'] = (string)$defaults['samesite'];
         }
 
-        if (array_key_exists('lifetime', $cookieConfig)) {
-            $options['lifetime'] = (int)$cookieConfig['lifetime'];
-        }
+        $casters = [
+            'lifetime' => static fn($v) => (int)$v,
+            'path'     => static fn($v) => (string)$v,
+            'domain'   => static fn($v) => (string)$v,
+            'secure'   => static fn($v) => (bool)$v,
+            'httponly' => static fn($v) => (bool)$v,
+            'samesite' => static fn($v) => (string)$v,
+        ];
 
-        if (array_key_exists('path', $cookieConfig)) {
-            $options['path'] = (string)$cookieConfig['path'];
-        }
-
-        if (array_key_exists('domain', $cookieConfig)) {
-            $options['domain'] = (string)$cookieConfig['domain'];
-        }
-
-        if (array_key_exists('secure', $cookieConfig)) {
-            $options['secure'] = (bool)$cookieConfig['secure'];
-        }
-
-        if (array_key_exists('httponly', $cookieConfig)) {
-            $options['httponly'] = (bool)$cookieConfig['httponly'];
-        }
-
-        if (array_key_exists('samesite', $cookieConfig)) {
-            $options['samesite'] = (string)$cookieConfig['samesite'];
+        foreach ($casters as $key => $cast) {
+            if (array_key_exists($key, $cookieConfig)) {
+                $options[$key] = $cast($cookieConfig[$key]);
+            }
         }
 
         return $options;

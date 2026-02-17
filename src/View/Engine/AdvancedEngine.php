@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\View\Engine;
 
+use RuntimeException;
 use PhpMVC\View\View;
 use PhpMVC\View\Traits\HasManager;
 
@@ -97,15 +98,25 @@ final class AdvancedEngine implements Engine
         if (!is_file($cached)
         || filesize($cached) === 0
         || filemtime($view->path) > filemtime($cached)) {
-            $content = $this->compile(file_get_contents($view->path));
-            file_put_contents($cached, $content);
+            $source = file_get_contents($view->path);
+            if ($source === false) {
+                throw new RuntimeException("Failed to read view source: {$view->path}");
+            }
+
+            $content = $this->compile($source);
+
+            $bytesWritten = file_put_contents($cached, $content, LOCK_EX);
+            if ($bytesWritten === false) {
+                throw new RuntimeException("Failed to write compiled view to cache: {$cached}");
+            }
         }
 
         extract($view->data);
 
         ob_start();
         include($cached);
-        $contents = ob_get_contents();
+        $buffer = ob_get_contents();
+        $contents = $buffer === false ? '' : $buffer;
         ob_end_clean();
 
         if ($layout = $this->layouts[$cached] ?? null) {

@@ -38,6 +38,7 @@ use Whoops\Handler\PrettyPageHandler;
  *    Any unreplaced placeholders are stripped from the final path.
  *
  * @package PhpMVC\Routing
+ * @since 1.2
  */
 class Router
 {
@@ -93,7 +94,7 @@ class Router
      *
      * @return void
      */
-    public function errorHandler(int $code, callable $handler)
+    public function errorHandler(int $code, callable $handler): void
     {
         $this->errorHandler[$code] = $handler;
     }
@@ -113,7 +114,7 @@ class Router
      *
      * @return mixed The result of the route handler or error handler.
      */
-    public function dispatch()
+    public function dispatch(): mixed
     {
         $paths = $this->paths();
 
@@ -125,7 +126,7 @@ class Router
         if ($matching) {
             $this->current = $matching;
 
-            if ($this->current->requiresAuth) {
+            if (property_exists($this->current, 'requiresAuth') && $this->current->requiresAuth) {
                 $this->authenticate($requestMethod, $requestPath);
             }
 
@@ -170,7 +171,7 @@ class Router
      *
      * @return mixed Result of the 400 error handler.
      */
-    public function dispatchNotAllowed()
+    public function dispatchNotAllowed(): mixed
     {
         $this->errorHandler[400] ??= fn() => 'not allowed';
         return $this->errorHandler[400]();
@@ -184,7 +185,7 @@ class Router
      *
      * @return mixed Result of the 404 error handler.
      */
-    public function dispatchNotFound()
+    public function dispatchNotFound(): mixed
     {
         $this->errorHandler[404] ??= fn() => 'not found';
         return $this->errorHandler[404]();
@@ -198,7 +199,7 @@ class Router
      *
      * @return mixed Result of the 500 error handler.
      */
-    public function dispatchError()
+    public function dispatchError(): mixed
     {
         $this->errorHandler[500] ??= fn() => 'server error';
         return $this->errorHandler[500]();
@@ -228,10 +229,10 @@ class Router
                 $replaces = [];
 
                 foreach ($parameters as $key => $value) {
-                    array_push($finds, "{{$key}}");
-                    array_push($replaces, $value);
-                    array_push($finds, "{{$key}?}");
-                    array_push($replaces, $value);
+                    $finds[] = "{{$key}}";
+                    $replaces[] = $value;
+                    $finds[] = "{{$key}?}";
+                    $replaces[] = $value;
                 }
 
                 $path = $route->path();
@@ -296,7 +297,7 @@ class Router
     private function normalize(string $requestUri): string
     {
         $path = parse_url($requestUri, PHP_URL_PATH);
-        $path = is_string($path) && $path !== '' ? $path : '/';
+        $path = is_string($path) && !empty($path) ? $path : '/';
 
         $path = '/' . ltrim($path, '/');
         $path = preg_replace('#/+#', '/', $path) ?: '/';
@@ -311,9 +312,7 @@ class Router
         }
 
         if (!empty($basePath)) {
-            if ($path === $basePath) {
-                return '/';
-            }
+            if ($path === $basePath) return '/';
 
             if (str_starts_with($path, $basePath . '/')) {
                 $path = substr($path, strlen($basePath));
@@ -331,12 +330,20 @@ class Router
 
         if ($requiresCsrf) {
             $session = session();
-            $token = (string)config('session.auth.csrf_identifier', 'token');
+            $config = (array)config('session.default', []);
+            $token = (string)($config['authentication']['csrf'] ?? 'token');
 
             if (!isset($_POST[$token])
             || !$session->has($token)
             || !hash_equals((string)$session->get($token), (string)($_POST[$token] ?? ''))) {
-                return $this->current->redirectToLogin($requestPath);
+                if (method_exists($this->current, 'redirectToLogin')) {
+                    return $this->current->redirectToLogin($requestPath);
+                } else {
+                    throw new RouteException(
+                        sprintf('Current route of class %s does not support redirectToLogin()',
+                        is_object($this->current) ? get_class($this->current) : gettype($this->current)
+                    ));
+                }
             }
         }
     }
