@@ -6,8 +6,6 @@ use Exception;
 use Throwable;
 use PhpMVC\Routing\Route;
 use PhpMVC\Routing\Exception\RouteException;
-use Whoops\Run;
-use Whoops\Handler\PrettyPageHandler;
 
 /**
  * Class Router
@@ -323,6 +321,21 @@ class Router
         return $path;
     }
 
+    /**
+     * Authenticate the request if the current route requires authentication.
+     *
+     * For non-GET/HEAD/OPTIONS requests, checks for a CSRF token in the POST data
+     * and validates it against the session. If validation fails, attempts to redirect
+     * to a login page defined by the route or configuration, or throws an exception
+     * if redirection is not supported.
+     *
+     * @param string $requestMethod HTTP method of the incoming request.
+     * @param string $requestPath   Path of the incoming request.
+     *
+     * @return void
+     *
+     * @throws RouteException If authentication fails and redirection is not supported.
+     */
     private function authenticate(string $requestMethod, string $requestPath)
     {
         $requestMethodUpper = strtoupper($requestMethod);
@@ -330,8 +343,9 @@ class Router
 
         if ($requiresCsrf) {
             $session = session();
-            $config = (array)config('session.default', []);
-            $token = (string)($config['authentication']['csrf'] ?? 'token');
+            $default = (string)config('session.default', 'native');
+            $config  = (array)config("session.{$default}", []);
+            $token   = (string)($config['authentication']['csrf'] ?? 'token');
 
             if (!isset($_POST[$token])
             || !$session->has($token)

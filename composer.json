@@ -12,6 +12,7 @@
             "PhpMVC\\Cache\\Exception\\": "src/Cache/Exception/",
             "PhpMVC\\Core\\": "src/Core/",
             "PhpMVC\\Database\\": "src/Database/",
+            "PhpMVC\\Component\\": "src/Component/",
             "PhpMVC\\Email\\": "src/Email/",
             "PhpMVC\\FileSystem\\": "src/FileSystem/",
             "PhpMVC\\Http\\": "src/Http/",
