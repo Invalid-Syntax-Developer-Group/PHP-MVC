@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace PhpMVC\Validation;
 
+use InvalidArgumentException;
 use PhpMVC\Validation\Rule\Rule;
 use PhpMVC\Validation\Exception\ValidationException;
 
@@ -31,6 +32,7 @@ use PhpMVC\Validation\Exception\ValidationException;
  *    for the provided session name is removed.
  *
  * @package PhpMVC\Validation
+ * @since 1.2
  */
 class Manager
 {
@@ -86,20 +88,18 @@ class Manager
      *
      * @throws ValidationException When validation fails.
      */
-    public function validate(array $data, array $rules, string $sessionName = 'errors'): array
+    public function validate(array $data, array $rules, string $sessionName = 'errors', array $ruleVariables = []): array
     {
         $errors = [];
 
         foreach ($rules as $field => $rulesForField) {
             foreach ($rulesForField as $rule) {
-                $name = $rule;
-                $params = [];
+                ['name' => $name, 'parameters' => $params] = $this->parseRuleDefinition($rule, $ruleVariables);
 
-                if (str_contains($rule, ':')) {
-                    [$name, $params] = explode(':', $rule);
-                    $params = explode(',', $params);
+                if (!isset($this->rules[$name])) {
+                    throw new InvalidArgumentException("Validation rule '{$name}' is not registered.");
                 }
-                
+
                 $processor = $this->rules[$name];
 
                 if (!$processor->validate($data, $field, $params)) {
@@ -107,7 +107,7 @@ class Manager
                         $errors[$field] = [];
                     }
 
-                    array_push($errors[$field], $processor->getMessage($data, $field, $params));
+                    $errors[$field][] = $processor->getMessage($data, $field, $params);
                 }
             }
         }
@@ -124,5 +124,127 @@ class Manager
         }
 
         return array_intersect_key($data, $rules);
+    }
+
+    /**
+     * Normalize parameters from various formats into a consistent array structure.
+     *
+     * Supported input formats:
+     *  - Array: ['param1', 'param2']
+     *  - String (comma-separated): "param1,param2"
+     *  - Null or empty string: treated as an empty array
+     *
+     * @param mixed $parameters The parameters to normalize.
+     * @param bool  $fromStringSyntax Whether the input is expected to be a string with comma-separated values.
+     *
+     * @return array Normalized parameters as an array.
+     */
+    private function normalizeParameters(mixed $parameters, bool $fromStringSyntax = false): array
+    {
+        if (is_array($parameters)) return $parameters;
+
+        if ($parameters === null || empty($parameters)) return [];
+
+        if ($fromStringSyntax && is_string($parameters)) {
+            return array_map('trim', explode(',', $parameters));
+        }
+
+        return (array)$parameters;
+    }
+
+    /**
+     * Parse a rule definition which can be either a string (with optional parameters) or an array.
+     *
+     * Supported formats:
+     *  - String: "rule" or "rule:param1,param2"
+     *  - Array with 'name' key: ['name' => 'rule', 'parameters' => [...]]
+     *  - List array: ['rule', param1, param2]
+     *
+     * @param string|array $definition The rule definition to parse.
+     *
+     * @return array An associative array with 'name' and 'parameters' keys.
+     *
+     * @throws InvalidArgumentException If the definition format is invalid.
+     */
+    private function parseRuleDefinition($definition, array $ruleVariables = []): array
+    {
+        if (is_string($definition)) {
+            $parts = explode(':', $definition, 2);
+            $name = $parts[0];
+            $params = $this->normalizeParameters($parts[1] ?? '', true);
+        } else if (is_array($definition)) {
+            if (isset($definition['name'])) {
+                $name = $definition['name'];
+                $params = $this->normalizeParameters($definition['parameters'] ?? [], false);
+            } else if (array_is_list($definition)) {
+                $name = $definition[0] ?? '';
+                $params = $this->normalizeParameters(array_slice($definition, 1), false);
+            } else {
+                throw new InvalidArgumentException('Invalid rule definition array format.');
+            }
+
+            if (!is_array($params)) {
+                $params = [$params];
+            }
+        } else {
+            throw new InvalidArgumentException('Rule definition must be a string or an array.');
+        }
+
+        $params = $this->resolveParameterTokens($params, $ruleVariables);
+
+        return ['name' => $name, 'parameters' => $params];
+    }
+
+    /**
+     * Resolve parameter tokens in an array of parameters.
+     *
+     * Each parameter is processed through {@see resolveParameterToken()} to handle
+     * any string tokens that start with "$" as variable references.
+     *
+     * @param array $params The array of parameters to resolve.
+     * @param array $ruleVariables An associative array of variable names to values for resolution.
+     *
+     * @return array The array of parameters with any tokens resolved to their corresponding values.
+     */
+    private function resolveParameterTokens(array $params, array $ruleVariables): array
+    {
+        return array_map(
+            fn($parameter) => $this->resolveParameterToken($parameter, $ruleVariables),
+            $params
+        );
+    }
+
+    /**
+     * Resolve a single parameter token if it starts with "$".
+     *
+     * If the parameter is a string starting with "$", it is treated as a variable reference
+     * and looked up in the provided `$ruleVariables` array. If the variable is not defined,
+     * an exception is thrown. If the parameter does not start with "$", it is returned as-is.
+     *
+     * @param mixed $parameter The parameter to resolve.
+     * @param array $ruleVariables An associative array of variable names to values for resolution.
+     *
+     * @return mixed The resolved parameter value or the original parameter if no resolution was needed.
+     *
+     * @throws InvalidArgumentException If a variable reference is not defined in `$ruleVariables`.
+     */
+    private function resolveParameterToken(mixed $parameter, array $ruleVariables): mixed
+    {
+        if (!is_string($parameter) || !str_starts_with($parameter, '$')) {
+            return $parameter;
+        }
+
+        $name = substr($parameter, 1);
+        if (empty($name)) {
+            return $parameter;
+        }
+
+        if (!array_key_exists($name, $ruleVariables)) {
+            throw new InvalidArgumentException(
+                "Validation rule variable '{$parameter}' is not defined."
+            );
+        }
+
+        return $ruleVariables[$name];
     }
 }

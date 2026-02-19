@@ -24,9 +24,9 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('validate')) {
-    function validate(array $data, array $rules, string $sessionName = 'errors')
+    function validate(array $data, array $rules, string $sessionName = 'errors', array $ruleVariables = [])
     {
-        return app('validator')->validate($data, $rules, $sessionName);
+        return app('validator')->validate($data, $rules, $sessionName, $ruleVariables);
     }
 }
 
@@ -48,7 +48,8 @@ if (!function_exists('csrf')) {
     function csrf(int $length = 64)
     {
         $session = session();
-        $config = config('session.default', []);
+        $default = (string)config('session.default', 'native');
+        $config = config("session.{$default}", []);
         $authentication = $config['authentication'] ?? [];
         $key = (string)($authentication['csrf'] ?? 'token');
 
@@ -116,5 +117,60 @@ if (!function_exists('email')) {
     function email()
     {
         return app('email');
+    }
+}
+
+if (!function_exists('component')) {
+    function component(string $name, array $props = [])
+    {
+        $base = app('paths.base');
+        $class = $base . '\\Components\\' . str_replace('.', '\\', $name);    
+        if (class_exists($class)) {
+            return (string) new $class($props);
+        }
+
+        throw new Exception("Component {$name} not found");
+    }
+}
+
+if (!function_exists('cookie_domain')) {
+    function cookie_domain(): string
+    {
+        $httpHost = (string)filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
+        if (!empty($httpHost) && $httpHost !== 'localhost' &&
+        filter_var($httpHost, FILTER_VALIDATE_IP) === false) {
+            $parts = explode('.', $httpHost);
+            if (count($parts) >= 2) {
+                return '.' . implode('.', array_slice($parts, -2));
+            }
+        }
+        return 'localhost';
+    }
+}
+
+if (!function_exists('secure_cookie')) {
+    function secure_cookie(): bool
+    {
+        $serverPort = (int)(filter_input(INPUT_SERVER, 'SERVER_PORT', FILTER_VALIDATE_INT) ?? ($_SERVER['SERVER_PORT'] ?? 0));
+        if ($serverPort === 443) {
+            return true;
+        }
+
+        $https = strtolower((string)($_SERVER['HTTPS'] ?? ''));
+        if (in_array($https, ['on', '1'], true)) {
+            return true;
+        }
+
+        $forwardedProto = strtolower(trim((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+        if (!empty($forwardedProto) && str_contains($forwardedProto, 'https')) {
+            return true;
+        }
+
+        $frontEndHttps = strtolower((string)($_SERVER['HTTP_FRONT_END_HTTPS'] ?? ''));
+        if (in_array($frontEndHttps, ['on', '1'], true)) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -29,9 +29,9 @@ final class InArrayRule implements Rule
     {
         if (empty($data[$field])) return true;
 
-        $allowedValues = $params[0] ?? null;
+        $allowedValues = $this->allowedValues($params);
 
-        if (!is_array($allowedValues)) return false; // Allowed values must be an array
+        if (empty($allowedValues)) return false;
 
         return in_array($data[$field], $allowedValues, true);
     }
@@ -47,10 +47,24 @@ final class InArrayRule implements Rule
      */
     public function getMessage(array $data, string $field, array $params): string
     {
+        $allowedValues = $this->allowedValues($params);
+
         return sprintf(
             'The %s field must be one of the following values: %s.',
             $field,
-            implode(', ', $params[0] ?? [])
+            implode(', ', $allowedValues)
         );
+    }
+
+    private function allowedValues(array $params): array
+    {
+        if (isset($params[0]) && is_array($params[0])) {
+            return $params[0];
+        }
+
+        return array_values(array_filter(
+            $params,
+            static fn($value) => !is_array($value)
+        ));
     }
 }

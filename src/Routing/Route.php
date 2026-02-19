@@ -302,7 +302,8 @@ class Route
             }
         }
 
-        $config         = (array)config('session.default', []);
+        $default        = (string)config('session.default', 'native');
+        $config         = (array)config("session.{$default}", []);
         $authentication = (array)($config['authentication'] ?? []);
         $subDomain      = (string)($authentication['subdomain'] ?? '');
         $path           = (string)($authentication['login_path'] ?? '');
@@ -351,7 +352,8 @@ class Route
      */
     private function authenticate(): void
     {
-        $config = (array)config('session.default', []);
+        $default = (string)config('session.default', 'native');
+        $config = (array)config("session.{$default}", []);
         $authentication = (array)($config['authentication'] ?? []);
         if ((!$authentication['enabled'] ?? false)) return;
 
@@ -370,7 +372,7 @@ class Route
             throw new DriverException('Session is not enabled');
         }
 
-        $cookieName = session_name();
+        $cookieName = session_name($config['name']);
         if (empty($cookieName)) {
             $cookieName = (string)($config['name'] ?? 'PHPSESSID');
         }
@@ -378,21 +380,6 @@ class Route
         $hasCookie = isset($_COOKIE[$cookieName]) &&
                      is_string($_COOKIE[$cookieName]) && !empty($_COOKIE[$cookieName]);
 
-        // $hasIncomingSid = false;
-        // $incomingParams = (array)config('session.incoming_sid_params', []);
-        // foreach ($incomingParams as $paramName) {
-        //     $candidate = filter_input(INPUT_GET, (string)$paramName, FILTER_UNSAFE_RAW);
-        //     if (is_string($candidate) && !empty($candidate)) {
-        //         $hasIncomingSid = true;
-        //         break;
-        //     }
-        // }
-
-        // If this request did not present a session cookie, force the auth flow.
-        // Allow an incoming sid parameter to prevent loops on the return-trip.
-        // if (!$hasCookie && !$hasIncomingSid) {
-        //     $this->redirectToLogin($requestUri);
-        // }
         if (!$hasCookie) {
             $this->redirectToLogin($requestUri);
         }
