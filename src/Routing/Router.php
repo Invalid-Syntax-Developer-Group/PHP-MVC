@@ -211,6 +211,13 @@ class Router
      *      - `{k}`  is replaced with the provided value
      *      - `{k?}` is replaced with the provided value
      *  - Any remaining placeholders `{...}` are removed.
+     * 
+     * Example:
+     * ```
+     * $route->name('user.profile')->path('/users/{id}/{section?}');
+     * $router->route('user.profile', ['id' => 42, 'section' => 'settings']);
+     * // returns: '/users/42/settings'
+     * ```
      *
      * @param string               $name       The route name ({@see Route::name()}).
      * @param array<string, mixed> $parameters Placeholder values keyed by placeholder name.

@@ -93,6 +93,7 @@ final class ViewProvider
     {
         $manager->addMacro('escape', fn($value) => htmlspecialchars($value, ENT_QUOTES));
         $manager->addMacro('includes', fn(...$params) => print view(...$params));
+        $manager->addMacro('component', fn(...$params) => print component(...$params));
     }
 
     /**

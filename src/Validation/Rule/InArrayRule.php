@@ -27,7 +27,7 @@ final class InArrayRule implements Rule
      */
     public function validate(array $data, string $field, array $params): bool
     {
-        if (empty($data[$field])) return true;
+        if (!array_key_exists($field, $data) || empty($data[$field])) return true;
 
         $allowedValues = $this->allowedValues($params);
 

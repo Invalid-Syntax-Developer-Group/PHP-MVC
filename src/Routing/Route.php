@@ -91,7 +91,6 @@ class Route
      * @param string $method  HTTP method for the route (e.g. GET, POST).
      * @param string $path    Path pattern (static or parameterized).
      * @param mixed  $handler Handler (callable or [class, method] tuple).
-     * @param bool   $requiresAuth Whether the route requires authentication.
      */
     public function __construct(string $method, string $path, $handler)
     {

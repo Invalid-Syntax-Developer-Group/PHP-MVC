@@ -60,11 +60,11 @@ final class BasicEngine implements Engine
 
         $replacements = [];
         foreach ($view->data as $key => $value) {
-            if (!is_string($value) || !preg_match('/^[A-Za-z0-9_]+$/', $key)) {
+            if (!is_string($value) || !preg_match('/^[A-Za-z0-9_.-]+$/', $key)) {
                 continue; // Skip non-string values and keys with invalid characters
             }
 
-            $replacements['{'.$key.'}'] = (string)$value;
+            $replacements[sprintf('{%s}', $key)] = (string)$value;
         }
 
         if (!empty($replacements)) {
