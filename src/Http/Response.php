@@ -163,6 +163,23 @@ final class Response
     }
 
     /**
+     * Set an HTML response.
+     *
+     * Assigns the response content and switches the response type
+     * to {@see HTML}.
+     *
+     * @param string $content HTML content to be sent.
+     *
+     * @return static Fluent return for chaining.
+     */
+    public function html(string $content): static
+    {
+        $this->content = $content;
+        $this->type = static::HTML;
+        return $this;
+    }
+
+    /**
      * Get or set the response type.
      *
      * Acts as a getter when called without arguments and as a setter

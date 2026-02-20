@@ -123,8 +123,12 @@ if (!function_exists('email')) {
 if (!function_exists('component')) {
     function component(string $name, array $props = [])
     {
-        $base = app('paths.base');
-        $class = $base . '\\Components\\' . str_replace('.', '\\', $name);    
+        if (!preg_match('/^[A-Za-z0-9_.]+$/', $name)) {
+            throw new Exception("Invalid component name: {$name}");
+        }
+
+        $base = app('paths.components');
+        $class = $base . '\\' . str_replace('.', '\\', $name);
         if (class_exists($class)) {
             return (string) new $class($props);
         }

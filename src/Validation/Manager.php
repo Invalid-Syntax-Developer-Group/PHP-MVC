@@ -74,7 +74,7 @@ class Manager
      * Behavior:
      *  - Iterates each field and its rule list.
      *  - Parses parameters when a rule contains ":" (e.g., "min:8").
-     *  - Runs the corresponding processor from {@see $rules} by alias.
+     *  - Runs the corresponding processor from {@see Rules} by alias.
      *  - Collects one or more error messages per field.
      *  - Throws {@see ValidationException} if any errors exist.
      *  - If successful, clears the session error bag for `$sessionName` (if session is available).
@@ -83,6 +83,7 @@ class Manager
      * @param array  $data        Raw input data (typically request input).
      * @param array  $rules       Validation rules keyed by field name.
      * @param string $sessionName Session key for storing errors (default: 'errors').
+     * @param array  $ruleVariables Optional associative array of variable names to values for parameter resolution in rules.
      *
      * @return array Filtered data containing only keys present in the `$rules` definition.
      *
